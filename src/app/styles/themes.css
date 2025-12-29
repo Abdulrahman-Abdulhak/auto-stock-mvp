@@ -1,0 +1,27 @@
+@import "tailwindcss";
+
+@custom-variant light (&:where(.light, .light *));
+@custom-variant dark (&:where(.dark, .dark *));
+
+.light {
+  --background: var(--color-background-light);
+  --foreground: var(--color-foreground-light);
+}
+
+.dark {
+  --background: var(--color-background-dark);
+  --foreground: var(--color-foreground-dark);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: var(--color-background-dark);
+    --foreground: var(--color-foreground-dark);
+  }
+}
+@media (prefers-color-scheme: light) {
+  :root {
+    --background: var(--color-background-light);
+    --foreground: var(--color-foreground-light);
+  }
+}

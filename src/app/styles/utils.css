@@ -1,0 +1,13 @@
+@utility flex-center {
+  @apply flex items-center justify-center;
+}
+
+@utility auto-repeat-cols-* {
+  grid-template-columns: repeat(auto-fill, minmax(--value([length]), 1fr));
+}
+
+@layer base {
+  svg.filter {
+    @apply hidden;
+  }
+}

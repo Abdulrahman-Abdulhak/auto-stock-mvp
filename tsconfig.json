@@ -1,0 +1,53 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["DOM", "DOM.Iterable", "ES2022"],
+    "allowJs": false,
+    "skipLibCheck": true,
+    "strict": true,
+    "noImplicitAny": true,
+    "noFallthroughCasesInSwitch": true,
+    "forceConsistentCasingInFileNames": true,
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "esModuleInterop": true,
+    "jsx": "react-jsx",
+    "incremental": true,
+    "baseUrl": "./src",
+    "paths": {
+      "@": ["./src"],
+      "@/*": ["./src/*"],
+
+      "@api": ["app/api"],
+      "@api/*": ["app/api/*"],
+
+      "@app": ["app"],
+      "@app/*": ["app/*"],
+
+      "@assets": ["assets"],
+      "@assets/*": ["assets/*"],
+
+      "@components": ["components"],
+      "@components/*": ["components/*"],
+
+      "@lib": ["lib"],
+      "@lib/*": ["lib/*"],
+
+      "@utils": ["utils"],
+      "@utils/*": ["utils/*"],
+
+      "@hooks": ["hooks"],
+      "@hooks/*": ["hooks/*"],
+
+      "@config": ["config"],
+      "@config/*": ["config/*"],
+
+      "@i18n": ["i18n"],
+      "@i18n/*": ["i18n/*"]
+    }
+  },
+  "include": ["next-env.d.ts", "src/**/*", ".next/types/**/*.ts"],
+  "exclude": ["node_modules"]
+}

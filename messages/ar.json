@@ -1,0 +1,10 @@
+{
+  "common": {
+    "errors": {
+      "unexpected": "حدث خطأ غير متوقع"
+    },
+    "success": {
+      "default": "تم بنجاح"
+    }
+  }
+}
