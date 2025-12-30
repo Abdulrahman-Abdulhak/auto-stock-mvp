@@ -12,3 +12,105 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
+
+model Product {
+  id            Int      @id @default(autoincrement())
+  SKU           String      @unique
+  name          String
+  minStockLevel Int?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+
+  productUnits ProductUnit[]
+  batches Batch[]
+  transactions Transaction[]
+}
+
+enum UnitType {
+  BASE      // piece, gram, ml
+  PACKAGE   // carton, box
+}
+
+model Unit {
+  id        Int      @id @default(autoincrement())
+  code      String   @unique // "piece", "carton"
+  type      UnitType @default(PACKAGE)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  productUnits ProductUnit[]
+}
+
+model ProductUnit {
+  id            Int  @id @default(autoincrement())
+  productId     Int
+  unitId        Int
+  multiplier    Int // ? how many BASE units
+
+  product Product @relation(fields: [productId], references: [id])
+  unit    Unit    @relation(fields: [unitId], references: [id])
+
+  @@unique([productId, unitId])
+}
+
+enum BatchStatusType {
+  ACTIVE
+  EXPIRED
+  DEPLETED
+}
+
+model Batch {
+  id            Int  @id @default(autoincrement())
+  productId     Int
+  expiresAt     DateTime
+  qtyRemaining  Int
+  qtyReceived   Int
+  status        BatchStatusType @default(ACTIVE)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  product Product @relation(fields: [productId], references: [id])
+  
+  transactions Transaction[]
+
+  @@index([productId, expiresAt])
+}
+
+enum TransactionType {
+  IN
+  OUT
+  ADJUST
+}
+
+model Transaction {
+  id            Int  @id @default(autoincrement())
+  type          TransactionType
+
+  productId     Int
+  batchId       Int?
+  qty           Int
+  createdById   Int
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  product Product @relation(fields: [productId], references: [id])
+  batch Batch? @relation(fields: [batchId], references: [id])
+  createdBy User @relation(fields: [createdById], references: [id])
+}
+
+model User {
+  id            Int  @id @default(autoincrement())
+  name          String
+  email         String @unique
+  password      String
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  transactions Transaction[]
+}

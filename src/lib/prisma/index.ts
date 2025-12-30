@@ -6,4 +6,4 @@ import { env } from "@lib/env";
 const connectionString = `${env.DATABASE_URL}`;
 
 const adapter = new PrismaPg({ connectionString });
-export const prisma = new PrismaClient({ adapter });
+export const prisma = new PrismaClient({ adapter } as any);
