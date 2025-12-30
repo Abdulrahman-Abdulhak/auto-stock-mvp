@@ -13,10 +13,10 @@ import { env } from "@lib/env";
  */
 export const siteConfig = {
   /** Human-readable product name shown in UI and metadata. */
-  name: "Next.js Template",
+  name: "Auto Stock",
 
   /** Short description used in metadata and landing surfaces. */
-  description: "The template for all Next.js projects.",
+  description: "Auto stock",
 
   /** Public base URL of the site (used for canonical URLs, redirects, etc.). */
   url: env.WEBSITE_URL,
