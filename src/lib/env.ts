@@ -4,6 +4,7 @@ import { z } from "zod";
  * Runtime environment validation schema.
  * - `NEXT_PUBLIC_APP_ENV` must be one of the allowed environment names.
  * - `WEBSITE_URL` is required and must be a valid URL.
+ * - `DATABASE_URL` is required and must be a valid URL.
  * - `API_BASE_URL` and `IMAGES_BASE_URL` are optional URLs.
  * - `ALLOWED_ORIGINS`, if provided, is a comma-separated string transformed
  *   into an array of trimmed origins.
@@ -11,7 +12,8 @@ import { z } from "zod";
 const envSchema = z.object({
   NEXT_PUBLIC_APP_ENV: z.enum(["development", "staging", "production"]),
   WEBSITE_URL: z.url(),
-  API_BASE_URL: z.url().optional(),
+  DATABASE_URL: z.url(),
+  API_BASE_URL: z.url(),
   IMAGES_BASE_URL: z.url().optional(),
   ALLOWED_ORIGINS: z
     .string()
@@ -37,15 +39,16 @@ type Env = z.infer<typeof envSchema>;
 export function parseEnv(input: NodeJS.ProcessEnv): Env {
   const parsedEnv = envSchema.safeParse({
     NEXT_PUBLIC_APP_ENV: input.NEXT_PUBLIC_APP_ENV,
-    API_BASE_URL: input.API_BASE_URL,
     WEBSITE_URL: input.WEBSITE_URL,
+    DATABASE_URL: input.DATABASE_URL,
+    API_BASE_URL: input.API_BASE_URL,
     IMAGES_BASE_URL: input.IMAGES_BASE_URL,
     ALLOWED_ORIGINS: input.ALLOWED_ORIGINS,
   });
 
   if (!parsedEnv.success) {
     if (!process.env.VITEST) {
-      console.log(input);
+      console.error("Input:", input);
       console.error("Invalid environment variables:", parsedEnv.error.issues);
     }
 
