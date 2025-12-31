@@ -7,9 +7,11 @@ import { AppBootstraps, AppProviders } from "@components";
 import { siteConfig } from "@config/site";
 import { supportedLocales } from "@config/locale";
 import { cn } from "@lib/cn";
-import { getDirection } from "@utils";
+import { getDirection } from "@i18n/direction";
 
 import "../globals.css";
+
+import { Header } from "./components";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -23,10 +25,10 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: siteConfig.name,
+    default: siteConfig.name.default,
     template: `%s | ${siteConfig.name}`,
   },
-  description: siteConfig.description,
+  description: siteConfig.description.default,
 };
 
 export function generateStaticParams() {
@@ -55,6 +57,7 @@ export default async function RootLayout({ children, params }: Props) {
         <AppBootstraps />
         <AppProviders>
           <div className="app">
+            <Header />
             <main>{children}</main>
           </div>
         </AppProviders>

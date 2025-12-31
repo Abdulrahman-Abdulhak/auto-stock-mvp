@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { useTheme } from "next-themes";
 
-import { getCookie } from "@utils";
+import { getCookie } from "@lib/storage";
 
 /**
  * Bootstrap hook that synchronizes the theme from the `app_theme` cookie

@@ -1,7 +1,11 @@
 {
   "compilerOptions": {
     "target": "ES2022",
-    "lib": ["DOM", "DOM.Iterable", "ES2022"],
+    "lib": [
+      "DOM",
+      "DOM.Iterable",
+      "ES2022"
+    ],
     "allowJs": false,
     "skipLibCheck": true,
     "strict": true,
@@ -17,40 +21,87 @@
     "incremental": true,
     "baseUrl": "./src",
     "paths": {
-      "@": ["./src"],
-      "@/*": ["./src/*"],
-
-      "@api": ["app/api"],
-      "@api/*": ["app/api/*"],
-
-      "@app": ["app"],
-      "@app/*": ["app/*"],
-
-      "@assets": ["assets"],
-      "@assets/*": ["assets/*"],
-
-      "@components": ["components"],
-      "@components/*": ["components/*"],
-
-      "@lib": ["lib"],
-      "@lib/*": ["lib/*"],
-
-      "@utils": ["utils"],
-      "@utils/*": ["utils/*"],
-
-      "@hooks": ["hooks"],
-      "@hooks/*": ["hooks/*"],
-
-      "@config": ["config"],
-      "@config/*": ["config/*"],
-
-      "@i18n": ["i18n"],
-      "@i18n/*": ["i18n/*"],
-
-      "@generated": ["generated"],
-      "@generated/*": ["generated/*"]
-    }
+      "@": [
+        "./src"
+      ],
+      "@/*": [
+        "./src/*"
+      ],
+      "@api": [
+        "app/api"
+      ],
+      "@api/*": [
+        "app/api/*"
+      ],
+      "@app": [
+        "app"
+      ],
+      "@app/*": [
+        "app/*"
+      ],
+      "@assets": [
+        "assets"
+      ],
+      "@assets/*": [
+        "assets/*"
+      ],
+      "@components": [
+        "components"
+      ],
+      "@components/*": [
+        "components/*"
+      ],
+      "@lib": [
+        "lib"
+      ],
+      "@lib/*": [
+        "lib/*"
+      ],
+      "@utils": [
+        "utils"
+      ],
+      "@utils/*": [
+        "utils/*"
+      ],
+      "@hooks": [
+        "hooks"
+      ],
+      "@hooks/*": [
+        "hooks/*"
+      ],
+      "@config": [
+        "config"
+      ],
+      "@config/*": [
+        "config/*"
+      ],
+      "@i18n": [
+        "i18n"
+      ],
+      "@i18n/*": [
+        "i18n/*"
+      ],
+      "@generated": [
+        "generated"
+      ],
+      "@generated/*": [
+        "generated/*"
+      ]
+    },
+    "noEmit": true,
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ]
   },
-  "include": ["next-env.d.ts", "src/**/*", ".next/types/**/*.ts"],
-  "exclude": ["node_modules"]
+  "include": [
+    "next-env.d.ts",
+    "src/**/*",
+    ".next/types/**/*.ts",
+    ".next/dev/types/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
 }

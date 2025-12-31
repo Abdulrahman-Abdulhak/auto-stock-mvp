@@ -12,11 +12,19 @@ import { env } from "@lib/env";
  * than duplicating strings throughout the app.
  */
 export const siteConfig = {
+  translationRoot: "app",
+
   /** Human-readable product name shown in UI and metadata. */
-  name: "Auto Stock",
+  name: {
+    default: "Auto Stock",
+    translated: "name",
+  },
 
   /** Short description used in metadata and landing surfaces. */
-  description: "Auto stock",
+  description: {
+    default: "Auto Stock",
+    translated: "description",
+  },
 
   /** Public base URL of the site (used for canonical URLs, redirects, etc.). */
   url: env.WEBSITE_URL,
