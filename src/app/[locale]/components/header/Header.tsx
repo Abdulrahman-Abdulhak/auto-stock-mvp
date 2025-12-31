@@ -1,38 +1,17 @@
-import { Logo } from "@components";
-import Navbar from "./Navbar";
+import { AppContainer, Logo } from "@components";
+import { navLinks } from "@lib/routing";
 
-const links = [
-  {
-    label: "dashboard.label",
-    href: "/dashboard",
-  },
-  {
-    label: "products.label",
-    href: "/products",
-  },
-  {
-    label: "batches.label",
-    href: "/batches",
-  },
-  {
-    label: "transactions.label",
-    href: "/transactions",
-  },
-  {
-    label: "reports.label",
-    href: "/reports",
-  },
-];
+import Navbar from "./Navbar";
 
 function Header() {
   return (
     <header className="bg-primary text-primary-foreground py-4">
-      <div className="max-w-7xl mx-auto">
+      <AppContainer>
         <div className="flex items-center gap-2">
           <Logo className="text-heading-4" />
-          <Navbar links={links} />
+          <Navbar links={navLinks} />
         </div>
-      </div>
+      </AppContainer>
     </header>
   );
 }

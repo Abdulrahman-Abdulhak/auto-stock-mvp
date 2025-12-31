@@ -11,3 +11,26 @@ export function isActivePath(
 
   return false;
 }
+
+export const navLinks = [
+  {
+    label: "dashboard.label",
+    href: "/dashboard",
+  },
+  {
+    label: "products.label",
+    href: "/products",
+  },
+  {
+    label: "batches.label",
+    href: "/batches",
+  },
+  {
+    label: "transactions.label",
+    href: "/transactions",
+  },
+  {
+    label: "reports.label",
+    href: "/reports",
+  },
+];
