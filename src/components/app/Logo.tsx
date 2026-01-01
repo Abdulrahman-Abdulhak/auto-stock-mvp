@@ -4,7 +4,7 @@ import Link from "next/link";
 
 import { getTranslations } from "next-intl/server";
 
-import { siteConfig } from "@config/site";
+import { siteConfig } from "@config/client";
 import { cn } from "@lib/cn";
 
 type Props = {

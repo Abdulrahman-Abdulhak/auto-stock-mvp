@@ -44,49 +44,6 @@ declare global {
     booleanify(val: any): boolean;
   }
 
-  interface Object {
-    /**
-     * Returns the boolean form of the object.
-     * Arrays return false when empty.
-     */
-    toBool(): boolean;
-
-    /**
-     * Checks whether the current object's primitive value is a primitive type.
-     *
-     * won't work on null or undefined values.
-     * @see [MDN Reference](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Data_structures#primitive_values)
-     */
-    isPrimitive(): boolean;
-
-    /**
-     * Checks the type of the current object's primitive value.
-     * @param type - Type string to compare against
-     */
-    isType(type: Parameters<ObjectConstructor["is"][0]>): boolean;
-
-    /**
-     * Returns a new object that merges the current object with the provided partial update.
-     * The update may be an object or a function that receives the current object and returns a partial update.
-     * @template T
-     * @param newObj - Partial update or updater function
-     * @returns Merged object
-     */
-    modify<T extends Object>(obj: Partial<T> | ((obj: T) => Partial<T>)): T;
-
-    /**
-     * Returns a new object that omits the provided keys from the given object.
-     * @template T, K
-     * @param obj - Source object
-     * @param keys - Keys to remove
-     * @returns Object without the specified keys
-     */
-    omit<T extends object, K extends readonly (keyof T)[]>(
-      obj: T,
-      keys: K
-    ): Omit<T, K[number]>;
-  }
-
   interface Array<T> {
     /**
      * Returns false when the list is empty, otherwise it returns true.
@@ -114,6 +71,11 @@ declare global {
      * Capitalizes each word in the string.
      */
     capitalize(): string;
+
+    /**
+     * Capitalizes the first word in the string.
+     */
+    capitalizeSentence(): string;
 
     /**
      * Generates a deterministic numeric hash for the string.

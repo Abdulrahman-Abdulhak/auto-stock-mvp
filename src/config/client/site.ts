@@ -1,6 +1,3 @@
-import { env } from "@lib/env";
-import * as client from "./client";
-
 /**
  * Global, user-facing metadata about the site.
  *
@@ -13,8 +10,17 @@ import * as client from "./client";
  * than duplicating strings throughout the app.
  */
 export const siteConfig = {
-  ...client.siteConfig,
+  translationRoot: "app",
 
-  /** Public base URL of the site (used for canonical URLs, redirects, etc.). */
-  url: env.WEBSITE_URL,
+  /** Human-readable product name shown in UI and metadata. */
+  name: {
+    default: "Auto Stock",
+    translated: "name",
+  },
+
+  /** Short description used in metadata and landing surfaces. */
+  description: {
+    default: "Auto Stock",
+    translated: "description",
+  },
 };

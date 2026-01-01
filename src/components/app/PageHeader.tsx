@@ -16,9 +16,9 @@ function PageHeader() {
   return activePath ? (
     <header className="border-b border-neutral-300 py-4 ">
       <AppContainer>
-        <h1 className="text-heading-1 capitalize">
+        <h2 className="text-heading-2 font-bold capitalize">
           {linksT(activePath.label)}
-        </h1>
+        </h2>
       </AppContainer>
     </header>
   ) : null;

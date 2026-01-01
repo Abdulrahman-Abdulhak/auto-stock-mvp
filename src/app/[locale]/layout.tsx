@@ -3,7 +3,12 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { setRequestLocale } from "next-intl/server";
 
-import { AppBootstraps, AppProviders, PageHeader } from "@components";
+import {
+  AppBootstraps,
+  AppContainer,
+  AppProviders,
+  PageHeader,
+} from "@components";
 import { siteConfig } from "@config/site";
 import { supportedLocales } from "@config/locale";
 import { cn } from "@lib/cn";
@@ -60,7 +65,7 @@ export default async function RootLayout({ children, params }: Props) {
             <Header />
             <main>
               <PageHeader />
-              {children}
+              <AppContainer>{children}</AppContainer>
             </main>
           </div>
         </AppProviders>

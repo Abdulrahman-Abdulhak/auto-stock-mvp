@@ -7,6 +7,11 @@
       "default": "Completed successfully"
     }
   },
+  "pagination": {
+    "pageXofN": "page {x} of {n}",
+    "showingXofN": "showing {x} of {n}",
+    "labeledShowingXofN": "showing {x} of {n} {label}"
+  },
   "app": {
     "name": "Auto Stock"
   },
@@ -25,6 +30,19 @@
     },
     "reports": {
       "label": "reports"
+    }
+  },
+  "products": {
+    "title": "products",
+    "buttons": {
+      "addProduct": "add new product"
+    }
+  },
+  "form": {
+    "search": {
+      "placeholders": {
+        "products": "search products..."
+      }
     }
   }
 }

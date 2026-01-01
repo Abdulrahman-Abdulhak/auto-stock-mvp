@@ -5,15 +5,10 @@ import { useTranslations } from "next-intl";
 
 import {
   NavigationMenu,
-  NavigationMenuContent,
-  NavigationMenuIndicator,
   NavigationMenuItem,
   NavigationMenuLink,
   NavigationMenuList,
-  NavigationMenuTrigger,
-  NavigationMenuViewport,
-} from "@/components/ui/navigation-menu";
-
+} from "@shadecn";
 import { isActivePath } from "@lib/routing";
 import { cn } from "@lib/cn";
 

@@ -29,6 +29,14 @@ defineProtoMethods(String.prototype, {
       .map((word) => word.replace(word[0], word[0].toUpperCase()))
       .join(" ");
   },
+  capitalizeSentence: function () {
+    const words = str(this).toWords();
+
+    const fstWord = words[0].capitalize();
+
+    if (words.length <= 1) return fstWord;
+    return fstWord + " " + words.slice(1).join(" ");
+  },
   hash: function (): number {
     let hash = 0;
     for (let i = 0; i < this.length; i++) {

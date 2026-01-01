@@ -1,3 +1,10 @@
+import { Header, ProductsTable } from "./components";
+
 export default function ProductsPage() {
-  return <div>Products</div>;
+  return (
+    <div>
+      <Header />
+      <ProductsTable />
+    </div>
+  );
 }
