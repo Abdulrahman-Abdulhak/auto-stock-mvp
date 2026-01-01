@@ -48,11 +48,11 @@ async function getProductsPage(args: {
   return (await res.json()) as FetchedData;
 }
 
-function clampInt(value: string | null, def: number, min: number, max: number) {
+function clampInt(value: string | null, def: number, max: number) {
   const n = Number(value);
   if (!Number.isFinite(n)) return def;
   const i = Math.trunc(n);
-  return Math.min(max, Math.max(min, i));
+  return Math.min(max, Math.max(def, i));
 }
 
 function ProductsTable() {
@@ -60,8 +60,8 @@ function ProductsTable() {
   const pathname = usePathname();
   const sp = useSearchParams();
 
-  const page = clampInt(sp.get("page"), 1, 1, 1_000_000);
-  const pageSize = clampInt(sp.get("pageSize"), 20, 1, 200);
+  const page = clampInt(sp.get("page"), 1, 1_000_000);
+  const pageSize = clampInt(sp.get("pageSize"), 20, 200);
   const qFromUrl = (sp.get("q") ?? "").trim();
 
   const pagination = { pageIndex: page - 1, pageSize };

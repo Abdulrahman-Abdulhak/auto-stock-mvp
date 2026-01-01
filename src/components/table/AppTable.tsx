@@ -67,6 +67,12 @@ function AppTable<TData, TValue>({
   });
 
   const currentPage = pagination.pageIndex + 1;
+  const remaining =
+    typeof totalCount === "number"
+      ? Math.max(0, totalCount - pagination.pageIndex * pagination.pageSize)
+      : null;
+  const shownCount =
+    remaining == null ? data.length : Math.min(pagination.pageSize, remaining);
 
   return (
     <div className="rounded-md border">
@@ -113,7 +119,7 @@ function AppTable<TData, TValue>({
       <footer className="flex justify-between items-center p-2">
         <p>
           {paginationT("labeledShowingXofN", {
-            x: pagination.pageSize,
+            x: shownCount,
             n: totalCount ?? 1,
             label: productsT("title"),
           })}
