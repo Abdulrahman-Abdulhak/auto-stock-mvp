@@ -6,6 +6,7 @@
     "success": {
       "default": "Completed successfully"
     },
+
     "buttons": {
       "cancel": "cancel"
     }
@@ -15,44 +16,13 @@
     "showingXofN": "showing {x} of {n}",
     "labeledShowingXofN": "showing {x} of {n} {label}"
   },
-  "app": {
-    "name": "Auto Stock"
-  },
-  "links": {
-    "dashboard": {
-      "label": "dashboard"
-    },
-    "products": {
-      "label": "products"
-    },
-    "batches": {
-      "label": "batches"
-    },
-    "transactions": {
-      "label": "transactions"
-    },
-    "reports": {
-      "label": "reports"
-    }
-  },
-  "products": {
-    "title": "products",
-    "buttons": {
-      "addProduct": "add new product"
-    },
-    "popups": {
-      "createNewProduct": {
-        "title": "create new product"
-      }
-    }
-  },
   "form": {
     "search": {
       "placeholders": {
-        "products": "search products..."
+        "products": "search products...",
+        "batches": "search products..."
       }
     },
-
     "name": {
       "labels": {
         "createNewProduct": "product name"
@@ -61,7 +31,6 @@
         "createNewProduct": "enter product name"
       }
     },
-
     "sku": {
       "labels": {
         "createNewProduct": "sku"
@@ -70,7 +39,6 @@
         "createNewProduct": "enter SKU"
       }
     },
-
     "minStockLevel": {
       "labels": {
         "createNewProduct": "minimum stock level"
@@ -79,7 +47,6 @@
         "createNewProduct": "enter minimum stock level"
       }
     },
-
     "currentStock": {
       "labels": {
         "createNewProduct": "current stock level"
@@ -88,10 +55,10 @@
         "createNewProduct": "enter minimum stock level"
       }
     },
-
     "submit": {
       "labels": {
-        "createNewProduct": "create product"
+        "createNewProduct": "create product",
+        "createNewBatch": "create batch"
       }
     },
 
@@ -112,6 +79,51 @@
       "currentStock": {
         "integer": "Current stock must be an integer",
         "notNegative": "Current stock cannot be negative"
+      }
+    }
+  },
+
+  "app": {
+    "name": "Auto Stock"
+  },
+  "links": {
+    "dashboard": {
+      "label": "dashboard"
+    },
+    "products": {
+      "label": "products"
+    },
+    "batches": {
+      "label": "batches"
+    },
+    "transactions": {
+      "label": "transactions"
+    },
+    "reports": {
+      "label": "reports"
+    }
+  },
+
+  "products": {
+    "title": "products",
+    "buttons": {
+      "addProduct": "add new product"
+    },
+    "popups": {
+      "createNewProduct": {
+        "title": "create new product"
+      }
+    }
+  },
+  "batches": {
+    "title": "batches",
+    "description": "Manage individual batches in your inventory.",
+    "buttons": {
+      "createNewBatch": "create new batch"
+    },
+    "popups": {
+      "createNewBatch": {
+        "title": "create new batch"
       }
     }
   }
