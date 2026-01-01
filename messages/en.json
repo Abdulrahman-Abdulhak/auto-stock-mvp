@@ -5,6 +5,9 @@
     },
     "success": {
       "default": "Completed successfully"
+    },
+    "buttons": {
+      "cancel": "cancel"
     }
   },
   "pagination": {
@@ -36,12 +39,79 @@
     "title": "products",
     "buttons": {
       "addProduct": "add new product"
+    },
+    "popups": {
+      "createNewProduct": {
+        "title": "create new product"
+      }
     }
   },
   "form": {
     "search": {
       "placeholders": {
         "products": "search products..."
+      }
+    },
+
+    "name": {
+      "labels": {
+        "createNewProduct": "product name"
+      },
+      "placeholders": {
+        "createNewProduct": "enter product name"
+      }
+    },
+
+    "sku": {
+      "labels": {
+        "createNewProduct": "sku"
+      },
+      "placeholders": {
+        "createNewProduct": "enter SKU"
+      }
+    },
+
+    "minStockLevel": {
+      "labels": {
+        "createNewProduct": "minimum stock level"
+      },
+      "placeholders": {
+        "createNewProduct": "enter minimum stock level"
+      }
+    },
+
+    "currentStock": {
+      "labels": {
+        "createNewProduct": "current stock level"
+      },
+      "placeholders": {
+        "createNewProduct": "enter minimum stock level"
+      }
+    },
+
+    "submit": {
+      "labels": {
+        "createNewProduct": "create product"
+      }
+    },
+
+    "errors": {
+      "name": {
+        "required": "name is required",
+        "tooLong": "name is too long"
+      },
+      "sku": {
+        "required": "SKU is required",
+        "tooLong": "SKU is too long",
+        "invalidChars": "SKU contains invalid characters"
+      },
+      "minStockLevel": {
+        "integer": "Minimum stock level must be an integer",
+        "notNegative": "Minimum stock level cannot be negative"
+      },
+      "currentStock": {
+        "integer": "Current stock must be an integer",
+        "notNegative": "Current stock cannot be negative"
       }
     }
   }
