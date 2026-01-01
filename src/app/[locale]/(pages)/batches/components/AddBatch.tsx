@@ -6,7 +6,7 @@ import { useState } from "react";
 import { PlusIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import {
   Button,
@@ -25,36 +25,38 @@ import {
 } from "@shadecn";
 import { useForm } from "react-hook-form";
 
-const MAX_NAME_LENGTH = 120;
-const MAX_SKU_LENGTH = 64;
+const emptyToUndefined = (value: unknown) => {
+  if (typeof value !== "string") return value;
+  const trimmed = value.trim();
+  return trimmed === "" ? undefined : trimmed;
+};
+
+type ProductOption = {
+  id: number;
+  name: string;
+  sku: string;
+};
+
+type ProductsResponse = {
+  data: ProductOption[];
+};
 
 function translatedSchema(t: ReturnType<typeof useTranslations>) {
   return z.object({
-    name: z
-      .string()
-      .trim()
-      .min(2, t("errors.name.required"))
-      .max(MAX_NAME_LENGTH, t("errors.name.tooLong")),
-
-    sku: z
-      .string()
-      .trim()
-      .min(2, t("errors.sku.required"))
-      .max(MAX_SKU_LENGTH, t("errors.sku.tooLong"))
-      // allow letters/numbers plus - _ . (common SKU patterns)
-      .regex(/^[A-Za-z0-9][A-Za-z0-9._-]*$/, t("errors.sku.invalidChars")),
-
-    minStockLevel: z.coerce
-      .number()
-      .int(t("errors.minStockLevel.integer"))
-      .min(0, t("errors.minStockLevel.notNegative"))
-      .default(0),
-
-    currentStock: z.coerce
+    productId: z.preprocess((value) => {
+      if (value == null || value === "") return undefined;
+      const num = Number(value);
+      return Number.isFinite(num) ? num : value;
+    }, z.number().int().min(1, "Product is required.")),
+    qtyReceived: z.coerce
       .number()
       .int(t("errors.currentStock.integer"))
       .min(0, t("errors.currentStock.notNegative"))
       .default(0),
+    expiresAt: z.preprocess(
+      emptyToUndefined,
+      z.string().min(1, "Expiration date is required.")
+    ),
   });
 }
 
@@ -63,22 +65,55 @@ export type CreateBatch = z.output<ReturnType<typeof translatedSchema>>;
 
 type ApiError = Error & { fields?: Record<string, string> };
 
+async function getProducts(args: {
+  q?: string;
+  signal?: AbortSignal;
+}): Promise<ProductOption[]> {
+  const params = new URLSearchParams();
+  params.set("page", "1");
+  params.set("pageSize", "20");
+  if (args.q) params.set("q", args.q);
+
+  const res = await fetch(`/api/products?${params.toString()}`, {
+    method: "GET",
+    headers: { "content-type": "application/json" },
+    cache: "no-store",
+    signal: args.signal,
+  });
+
+  if (!res.ok) {
+    const msg = await res.text().catch(() => "");
+    throw new Error(`Failed to load products (${res.status}). ${msg}`);
+  }
+
+  const data = (await res.json()) as ProductsResponse;
+  return data.data ?? [];
+}
+
 function AddBatch() {
   const batchesT = useTranslations("batches");
   const formT = useTranslations("form");
   const commonT = useTranslations("common");
 
   const [open, setOpen] = useState(false);
+  const [productSearch, setProductSearch] = useState("");
   const queryClient = useQueryClient();
 
   const form = useForm<CreateBatchInput, unknown, CreateBatch>({
     resolver: zodResolver(translatedSchema(formT)),
     defaultValues: {
-      name: "",
-      sku: "",
-      currentStock: 0,
-      minStockLevel: 0,
+      productId: "",
+      qtyReceived: 0,
+      expiresAt: "",
     },
+  });
+
+  const productsQuery = useQuery({
+    queryKey: ["products", `products-search-${productSearch}`],
+    queryFn: ({ signal }) => getProducts({ q: productSearch, signal }),
+    staleTime: 30_000,
+    gcTime: 5 * 60_000,
+    retry: 1,
   });
 
   const createBatch = useMutation({
@@ -86,7 +121,11 @@ function AddBatch() {
       const res = await fetch("/api/batches", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify(values),
+        body: JSON.stringify({
+          productId: values.productId,
+          qtyReceived: values.qtyReceived,
+          expiresAt: values.expiresAt,
+        }),
       });
 
       if (!res.ok) {
@@ -104,10 +143,9 @@ function AddBatch() {
     },
     onSuccess: async () => {
       form.reset({
-        name: "",
-        sku: "",
-        currentStock: 0,
-        minStockLevel: 0,
+        productId: "",
+        qtyReceived: 0,
+        expiresAt: "",
       });
       setOpen(false);
       await queryClient.invalidateQueries({ queryKey: ["batches"] });
@@ -124,6 +162,8 @@ function AddBatch() {
   function onSubmit(values: CreateBatch) {
     createBatch.mutate(values);
   }
+
+  const productOptions = productsQuery.data ?? [];
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -149,21 +189,45 @@ function AddBatch() {
             onSubmit={form.handleSubmit(onSubmit)}
             className="flex flex-col gap-3"
           >
+            <FormItem>
+              <FormLabel className="capitalize">product search</FormLabel>
+              <FormControl>
+                <Input
+                  value={productSearch}
+                  onChange={(event) => setProductSearch(event.target.value)}
+                  placeholder="Search products..."
+                />
+              </FormControl>
+            </FormItem>
             <FormField
               control={form.control}
-              name="name"
+              name="productId"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="capitalize">
-                    {formT("name.labels.createNewBatch")}
-                  </FormLabel>
+                  <FormLabel className="capitalize">product</FormLabel>
                   <FormControl>
-                    <Input
-                      {...field}
-                      placeholder={formT(
-                        "name.placeholders.createNewBatch"
-                      ).capitalizeSentence()}
-                    />
+                    <select
+                      value={(field.value as string) ?? ""}
+                      onChange={(event) => field.onChange(event.target.value)}
+                      className="border-input h-9 w-full rounded-md border bg-transparent px-3 text-sm"
+                    >
+                      <option value="">Select a product</option>
+                      {productsQuery.isLoading ? (
+                        <option value="" disabled>
+                          Loading...
+                        </option>
+                      ) : null}
+                      {productsQuery.isError ? (
+                        <option value="" disabled>
+                          Failed to load products
+                        </option>
+                      ) : null}
+                      {productOptions.map((product) => (
+                        <option key={product.id} value={product.id}>
+                          {product.name} ({product.sku})
+                        </option>
+                      ))}
+                    </select>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -171,31 +235,11 @@ function AddBatch() {
             />
             <FormField
               control={form.control}
-              name="sku"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="uppercase">
-                    {formT("sku.labels.createNewBatch")}
-                  </FormLabel>
-                  <FormControl>
-                    <Input
-                      {...field}
-                      placeholder={formT(
-                        "sku.placeholders.createNewBatch"
-                      ).capitalizeSentence()}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="minStockLevel"
+              name="qtyReceived"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="capitalize">
-                    {formT("minStockLevel.labels.createNewBatch")}
+                    initial received quantity
                   </FormLabel>
                   <FormControl>
                     <Input
@@ -204,9 +248,7 @@ function AddBatch() {
                       inputMode="numeric"
                       value={(field.value as string) ?? ""}
                       onChange={(event) => field.onChange(event.target.value)}
-                      placeholder={formT(
-                        "minStockLevel.placeholders.createNewBatch"
-                      ).capitalizeSentence()}
+                      placeholder="0"
                     />
                   </FormControl>
                   <FormMessage />
@@ -215,22 +257,16 @@ function AddBatch() {
             />
             <FormField
               control={form.control}
-              name="currentStock"
+              name="expiresAt"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="capitalize">
-                    {formT("currentStock.labels.createNewBatch")}
-                  </FormLabel>
+                  <FormLabel className="capitalize">expiry date</FormLabel>
                   <FormControl>
                     <Input
                       {...field}
-                      type="number"
-                      inputMode="numeric"
+                      type="date"
                       value={(field.value as string) ?? ""}
                       onChange={(event) => field.onChange(event.target.value)}
-                      placeholder={formT(
-                        "currentStock.placeholders.createNewBatch"
-                      ).capitalizeSentence()}
                     />
                   </FormControl>
                   <FormMessage />

@@ -9,6 +9,43 @@ function toInt(value: string | null, fallback: number) {
   return Number.isFinite(n) ? Math.trunc(n) : fallback;
 }
 
+function parseNonNegativeInt(value: unknown) {
+  if (value == null || value === "") {
+    return { ok: true, value: 0 };
+  }
+
+  const n = typeof value === "number" ? value : Number(value);
+  if (!Number.isFinite(n) || !Number.isInteger(n) || n < 0) {
+    return { ok: false, value: 0 };
+  }
+
+  return { ok: true, value: n };
+}
+
+function parsePositiveInt(value: unknown) {
+  if (value == null || value === "") {
+    return { ok: false, value: 0 };
+  }
+
+  const n = typeof value === "number" ? value : Number(value);
+  if (!Number.isFinite(n) || !Number.isInteger(n) || n <= 0) {
+    return { ok: false, value: 0 };
+  }
+
+  return { ok: true, value: n };
+}
+
+function parseRequiredDate(value: unknown) {
+  if (value == null || value === "") {
+    return { ok: false, value: null as Date | null };
+  }
+  const d = value instanceof Date ? value : new Date(String(value));
+  if (Number.isNaN(d.getTime())) {
+    return { ok: false, value: null as Date | null };
+  }
+  return { ok: true, value: d };
+}
+
 export async function GET(req: Request) {
   try {
     const url = new URL(req.url);
@@ -108,6 +145,115 @@ export async function GET(req: Request) {
     console.error("GET /api/batches failed:", err);
     return NextResponse.json(
       { error: "Failed to fetch batches" },
+      { status: 500 }
+    );
+  }
+}
+
+export async function POST(req: Request) {
+  try {
+    const body = await req.json().catch(() => null);
+
+    if (!body || typeof body !== "object") {
+      return NextResponse.json(
+        { error: "Invalid JSON payload" },
+        { status: 400 }
+      );
+    }
+
+    const productId = parsePositiveInt(body.productId);
+    const qtyReceived = parseNonNegativeInt(body.qtyReceived);
+    const expiresAt = parseRequiredDate(body.expiresAt);
+
+    const errors: Record<string, string> = {};
+
+    if (!productId.ok) {
+      errors.productId = "Product is required.";
+    }
+
+    if (!qtyReceived.ok) {
+      errors.qtyReceived =
+        "Initial received quantity must be a non-negative integer.";
+    }
+
+    if (!expiresAt.ok) {
+      errors.expiresAt = "Expiration date is required.";
+    }
+
+    if (Object.keys(errors).length > 0) {
+      return NextResponse.json(
+        { error: "Validation failed", fields: errors },
+        { status: 400 }
+      );
+    }
+
+    const product = await prisma.product.findUnique({
+      where: { id: productId.value },
+      select: { id: true, name: true, SKU: true },
+    });
+
+    if (!product) {
+      return NextResponse.json(
+        { error: "Product not found.", fields: { productId: "Product not found." } },
+        { status: 404 }
+      );
+    }
+
+    const batch = await prisma.batch.create({
+      data: {
+        productId: product.id,
+        qtyReceived: qtyReceived.value,
+        qtyRemaining: qtyReceived.value,
+        status: BatchStatusType.ACTIVE,
+        expiresAt: expiresAt.value!,
+      },
+      select: {
+        id: true,
+        status: true,
+        qtyReceived: true,
+        qtyRemaining: true,
+        expiresAt: true,
+        updatedAt: true,
+        product: {
+          select: {
+            id: true,
+            name: true,
+            SKU: true,
+          },
+        },
+      },
+    });
+
+    return NextResponse.json(
+      {
+        data: {
+          id: batch.id,
+          productId: batch.product.id,
+          name: batch.product.name,
+          sku: batch.product.SKU,
+          status: batch.status,
+          qtyReceived: batch.qtyReceived,
+          qtyRemaining: batch.qtyRemaining,
+          expiresAt: batch.expiresAt,
+          updatedAt: batch.updatedAt,
+        },
+      },
+      { status: 201 }
+    );
+  } catch (err) {
+    if (
+      err instanceof Prisma.PrismaClientKnownRequestError &&
+      err.code === "P2002"
+    ) {
+      return NextResponse.json(
+        { error: "Batch already exists." },
+        { status: 409 }
+      );
+    }
+
+    console.error("POST /api/batches failed:", err);
+    return NextResponse.json(
+      { error: "Failed to create batch" },
       { status: 500 }
     );
   }

@@ -2,7 +2,6 @@
 
 import type { PaginationState } from "@tanstack/react-table";
 
-import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 
 import { ProductRow } from "./types";
@@ -85,7 +84,7 @@ function ProductsTable() {
       "products",
       `products-page-${page}`,
       `products-pagesize-${pageSize}`,
-      `products-qFromUrl-${qFromUrl}`,
+      `products-search-${qFromUrl}`,
     ],
     queryFn: ({ signal }) =>
       getProductsPage({ page, pageSize, signal, q: qFromUrl }),
