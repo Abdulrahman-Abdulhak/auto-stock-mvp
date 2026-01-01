@@ -1,10 +1,9 @@
 {
   "common": {
-    "errors": {
-      "unexpected": "An unexpected error occurred"
-    },
-    "success": {
-      "default": "Completed successfully"
+    "state": {
+      "error": "An unexpected error occurred",
+      "success": "Completed successfully",
+      "loading": "Loading..."
     },
 
     "buttons": {
@@ -20,7 +19,8 @@
     "search": {
       "placeholders": {
         "products": "search products...",
-        "batches": "search products..."
+        "batches": "search batches...",
+        "createNewBatch": "search products..."
       }
     },
     "name": {
@@ -55,6 +55,24 @@
         "createNewProduct": "enter minimum stock level"
       }
     },
+    "productSelect": {
+      "labels": {
+        "createNewBatch": "product"
+      },
+      "placeholders": {
+        "createNewBatch": "create batch"
+      }
+    },
+    "qtyReceived": {
+      "labels": {
+        "createNewBatch": "initial received quantity"
+      }
+    },
+    "expiresAt": {
+      "labels": {
+        "createNewBatch": "expiry date"
+      }
+    },
     "submit": {
       "labels": {
         "createNewProduct": "create product",
@@ -79,6 +97,14 @@
       "currentStock": {
         "integer": "Current stock must be an integer",
         "notNegative": "Current stock cannot be negative"
+      },
+      "productId": {
+        "required": "Product is required"
+      },
+      "expiresAt": {
+        "required": "Expiration date is required",
+        "invalid": "Expiration date is invalid",
+        "atLeastTomorrow": "Expiration date must be at least tomorrow."
       }
     }
   },

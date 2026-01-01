@@ -22,14 +22,14 @@ import {
   FormLabel,
   FormMessage,
   Input,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from "@shadecn";
 import { useForm } from "react-hook-form";
-
-const emptyToUndefined = (value: unknown) => {
-  if (typeof value !== "string") return value;
-  const trimmed = value.trim();
-  return trimmed === "" ? undefined : trimmed;
-};
+import { Searchbar } from "@components";
 
 type ProductOption = {
   id: number;
@@ -44,18 +44,31 @@ type ProductsResponse = {
 function translatedSchema(t: ReturnType<typeof useTranslations>) {
   return z.object({
     productId: z.preprocess((value) => {
-      if (value == null || value === "") return undefined;
+      if (value == null || value === "") return -1;
       const num = Number(value);
-      return Number.isFinite(num) ? num : value;
-    }, z.number().int().min(1, "Product is required.")),
+      return Number.isFinite(num) ? num : -1;
+    }, z.number().int().min(1, t("errors.productId.required"))),
     qtyReceived: z.coerce
       .number()
       .int(t("errors.currentStock.integer"))
       .min(0, t("errors.currentStock.notNegative"))
       .default(0),
     expiresAt: z.preprocess(
-      emptyToUndefined,
-      z.string().min(1, "Expiration date is required.")
+      (value) => (typeof value === "string" ? value.trim() : ""),
+      z
+        .string()
+        .min(1, t("errors.expiresAt.required"))
+        .refine((value) => {
+          const date = new Date(`${value}T00:00:00`);
+          return !Number.isNaN(date.getTime());
+        }, t("errors.expiresAt.invalid"))
+        .refine((value) => {
+          const date = new Date(`${value}T00:00:00`);
+          const tomorrow = new Date();
+          tomorrow.setHours(0, 0, 0, 0);
+          tomorrow.setDate(tomorrow.getDate() + 1);
+          return date >= tomorrow;
+        }, t("errors.expiresAt.atLeastTomorrow"))
     ),
   });
 }
@@ -189,45 +202,49 @@ function AddBatch() {
             onSubmit={form.handleSubmit(onSubmit)}
             className="flex flex-col gap-3"
           >
-            <FormItem>
-              <FormLabel className="capitalize">product search</FormLabel>
-              <FormControl>
-                <Input
-                  value={productSearch}
-                  onChange={(event) => setProductSearch(event.target.value)}
-                  placeholder="Search products..."
-                />
-              </FormControl>
-            </FormItem>
+            <Searchbar
+              onDebouncedChange={setProductSearch}
+              section="createNewBatch"
+            />
             <FormField
               control={form.control}
               name="productId"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="capitalize">product</FormLabel>
+                  <FormLabel className="capitalize">
+                    {formT("productSelect.labels.createNewBatch")}
+                  </FormLabel>
                   <FormControl>
-                    <select
+                    <Select
+                      {...field}
                       value={(field.value as string) ?? ""}
-                      onChange={(event) => field.onChange(event.target.value)}
-                      className="border-input h-9 w-full rounded-md border bg-transparent px-3 text-sm"
+                      onValueChange={field.onChange}
                     >
-                      <option value="">Select a product</option>
-                      {productsQuery.isLoading ? (
-                        <option value="" disabled>
-                          Loading...
-                        </option>
-                      ) : null}
-                      {productsQuery.isError ? (
-                        <option value="" disabled>
-                          Failed to load products
-                        </option>
-                      ) : null}
-                      {productOptions.map((product) => (
-                        <option key={product.id} value={product.id}>
-                          {product.name} ({product.sku})
-                        </option>
-                      ))}
-                    </select>
+                      <SelectTrigger className="w-full">
+                        <SelectValue
+                          placeholder={formT(
+                            "productSelect.placeholders.createNewBatch"
+                          )}
+                        />
+                      </SelectTrigger>
+                      <SelectContent className="w-full">
+                        {productsQuery.isLoading ? (
+                          <SelectItem value="loading" disabled>
+                            {commonT("state.loading")}
+                          </SelectItem>
+                        ) : null}
+                        {productsQuery.isError ? (
+                          <SelectItem value="error" disabled>
+                            Failed to load products
+                          </SelectItem>
+                        ) : null}
+                        {productOptions.map((product) => (
+                          <SelectItem key={product.id} value={`${product.id}`}>
+                            {product.name} ({product.sku})
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -239,7 +256,7 @@ function AddBatch() {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="capitalize">
-                    initial received quantity
+                    {formT("qtyReceived.labels.createNewBatch")}
                   </FormLabel>
                   <FormControl>
                     <Input
@@ -248,7 +265,6 @@ function AddBatch() {
                       inputMode="numeric"
                       value={(field.value as string) ?? ""}
                       onChange={(event) => field.onChange(event.target.value)}
-                      placeholder="0"
                     />
                   </FormControl>
                   <FormMessage />
@@ -260,7 +276,9 @@ function AddBatch() {
               name="expiresAt"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="capitalize">expiry date</FormLabel>
+                  <FormLabel className="capitalize">
+                    {formT("expiresAt.labels.createNewBatch")}
+                  </FormLabel>
                   <FormControl>
                     <Input
                       {...field}
