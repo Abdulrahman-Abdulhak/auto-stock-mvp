@@ -11,14 +11,27 @@ async function main() {
   // Units
   const piece = await prisma.unit.upsert({
     where: { code: "piece" },
-    update: {},
-    create: { code: "piece", type: UnitType.BASE },
+    update: { baseUnitId: null, conversionToBase: 1 },
+    create: {
+      code: "piece",
+      type: UnitType.BASE,
+      baseUnitId: null,
+      conversionToBase: 1,
+    },
   });
 
   const carton = await prisma.unit.upsert({
     where: { code: "carton" },
-    update: {},
-    create: { code: "carton", type: UnitType.PACKAGE },
+    update: {
+      baseUnitId: piece.id,
+      conversionToBase: 24,
+    },
+    create: {
+      code: "carton",
+      type: UnitType.PACKAGE,
+      baseUnitId: piece.id,
+      conversionToBase: 24,
+    },
   });
 
   // User
@@ -44,23 +57,11 @@ async function main() {
     },
   });
 
-  // Product units (conversion)
-  await prisma.productUnit.upsert({
-    where: { productId_unitId: { productId: product.id, unitId: piece.id } },
-    update: { multiplier: 1 },
-    create: { productId: product.id, unitId: piece.id, multiplier: 1 },
-  });
-
-  await prisma.productUnit.upsert({
-    where: { productId_unitId: { productId: product.id, unitId: carton.id } },
-    update: { multiplier: 24 },
-    create: { productId: product.id, unitId: carton.id, multiplier: 24 },
-  });
-
   // Batch
   const batch = await prisma.batch.create({
     data: {
       productId: product.id,
+      unitId: piece.id,
       expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 60), // ~60 days
       qtyReceived: 24,
       qtyRemaining: 24,

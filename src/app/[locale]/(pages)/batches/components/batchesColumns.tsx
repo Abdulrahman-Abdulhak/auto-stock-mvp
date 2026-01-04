@@ -14,6 +14,13 @@ const statusTone: Record<string, "secondary" | "default" | "destructive"> = {
 
 export const batchColumns: ColumnDef<BatchRow>[] = [
   {
+    accessorKey: "id",
+    header: "Batch ID",
+    cell: ({ row }) => (
+      <span className="font-mono text-sm">{row.getValue("id")}</span>
+    ),
+  },
+  {
     accessorKey: "sku",
     header: "SKU",
     cell: ({ row }) => (

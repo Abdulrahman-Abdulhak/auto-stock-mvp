@@ -63,6 +63,14 @@
         "createNewBatch": "create batch"
       }
     },
+    "unitSelect": {
+      "labels": {
+        "createNewBatch": "unit"
+      },
+      "placeholders": {
+        "createNewBatch": "select unit"
+      }
+    },
     "qtyReceived": {
       "labels": {
         "createNewBatch": "initial received quantity"
@@ -100,6 +108,9 @@
       },
       "productId": {
         "required": "Product is required"
+      },
+      "unitId": {
+        "required": "Unit is required"
       },
       "expiresAt": {
         "required": "Expiration date is required",

@@ -23,7 +23,6 @@ model Product {
   updatedAt DateTime @updatedAt
 
 
-  productUnits ProductUnit[]
   batches Batch[]
   transactions Transaction[]
 }
@@ -37,23 +36,15 @@ model Unit {
   id        Int      @id @default(autoincrement())
   code      String   @unique // "piece", "carton"
   type      UnitType @default(PACKAGE)
+  baseUnitId Int?
+  conversionToBase Int @default(1)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  productUnits ProductUnit[]
-}
-
-model ProductUnit {
-  id            Int  @id @default(autoincrement())
-  productId     Int
-  unitId        Int
-  multiplier    Int // ? how many BASE units
-
-  product Product @relation(fields: [productId], references: [id])
-  unit    Unit    @relation(fields: [unitId], references: [id])
-
-  @@unique([productId, unitId])
+  batches Batch[]
+  baseUnit Unit? @relation("UnitToBaseUnit", fields: [baseUnitId], references: [id])
+  derivedUnits Unit[] @relation("UnitToBaseUnit")
 }
 
 enum BatchStatusType {
@@ -65,6 +56,7 @@ enum BatchStatusType {
 model Batch {
   id            Int  @id @default(autoincrement())
   productId     Int
+  unitId        Int?
   expiresAt     DateTime
   qtyRemaining  Int
   qtyReceived   Int
@@ -74,6 +66,7 @@ model Batch {
   updatedAt DateTime @updatedAt
 
   product Product @relation(fields: [productId], references: [id])
+  unit    Unit?   @relation(fields: [unitId], references: [id])
   
   transactions Transaction[]
 

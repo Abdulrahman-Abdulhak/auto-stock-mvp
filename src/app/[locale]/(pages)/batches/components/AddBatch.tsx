@@ -41,6 +41,15 @@ type ProductsResponse = {
   data: ProductOption[];
 };
 
+type UnitOption = {
+  id: number;
+  code: string;
+};
+
+type UnitsResponse = {
+  data: UnitOption[];
+};
+
 function translatedSchema(t: ReturnType<typeof useTranslations>) {
   return z.object({
     productId: z.preprocess((value) => {
@@ -48,6 +57,11 @@ function translatedSchema(t: ReturnType<typeof useTranslations>) {
       const num = Number(value);
       return Number.isFinite(num) ? num : -1;
     }, z.number().int().min(1, t("errors.productId.required"))),
+    unitId: z.preprocess((value) => {
+      if (value == null || value === "") return -1;
+      const num = Number(value);
+      return Number.isFinite(num) ? num : -1;
+    }, z.number().int().min(1, t("errors.unitId.required"))),
     qtyReceived: z.coerce
       .number()
       .int(t("errors.currentStock.integer"))
@@ -103,6 +117,23 @@ async function getProducts(args: {
   return data.data ?? [];
 }
 
+async function getUnits(args: { signal?: AbortSignal }): Promise<UnitOption[]> {
+  const res = await fetch("/api/units", {
+    method: "GET",
+    headers: { "content-type": "application/json" },
+    cache: "no-store",
+    signal: args.signal,
+  });
+
+  if (!res.ok) {
+    const msg = await res.text().catch(() => "");
+    throw new Error(`Failed to load units (${res.status}). ${msg}`);
+  }
+
+  const data = (await res.json()) as UnitsResponse;
+  return data.data ?? [];
+}
+
 function AddBatch() {
   const batchesT = useTranslations("batches");
   const formT = useTranslations("form");
@@ -116,6 +147,7 @@ function AddBatch() {
     resolver: zodResolver(translatedSchema(formT)),
     defaultValues: {
       productId: "",
+      unitId: "",
       qtyReceived: 0,
       expiresAt: "",
     },
@@ -129,6 +161,14 @@ function AddBatch() {
     retry: 1,
   });
 
+  const unitsQuery = useQuery({
+    queryKey: ["units"],
+    queryFn: ({ signal }) => getUnits({ signal }),
+    staleTime: 30_000,
+    gcTime: 5 * 60_000,
+    retry: 1,
+  });
+
   const createBatch = useMutation({
     mutationFn: async (values: CreateBatch) => {
       const res = await fetch("/api/batches", {
@@ -136,6 +176,7 @@ function AddBatch() {
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
           productId: values.productId,
+          unitId: values.unitId,
           qtyReceived: values.qtyReceived,
           expiresAt: values.expiresAt,
         }),
@@ -157,6 +198,7 @@ function AddBatch() {
     onSuccess: async () => {
       form.reset({
         productId: "",
+        unitId: "",
         qtyReceived: 0,
         expiresAt: "",
       });
@@ -177,6 +219,7 @@ function AddBatch() {
   }
 
   const productOptions = productsQuery.data ?? [];
+  const unitOptions = unitsQuery.data ?? [];
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -241,6 +284,50 @@ function AddBatch() {
                         {productOptions.map((product) => (
                           <SelectItem key={product.id} value={`${product.id}`}>
                             {product.name} ({product.sku})
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="unitId"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="capitalize">
+                    {formT("unitSelect.labels.createNewBatch")}
+                  </FormLabel>
+                  <FormControl>
+                    <Select
+                      {...field}
+                      value={(field.value as string) ?? ""}
+                      onValueChange={field.onChange}
+                    >
+                      <SelectTrigger className="w-full">
+                        <SelectValue
+                          placeholder={formT(
+                            "unitSelect.placeholders.createNewBatch"
+                          )}
+                        />
+                      </SelectTrigger>
+                      <SelectContent className="w-full">
+                        {unitsQuery.isLoading ? (
+                          <SelectItem value="loading" disabled>
+                            {commonT("state.loading")}
+                          </SelectItem>
+                        ) : null}
+                        {unitsQuery.isError ? (
+                          <SelectItem value="error" disabled>
+                            Failed to load units
+                          </SelectItem>
+                        ) : null}
+                        {unitOptions.map((unit) => (
+                          <SelectItem key={unit.id} value={`${unit.id}`}>
+                            {unit.code}
                           </SelectItem>
                         ))}
                       </SelectContent>

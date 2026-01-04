@@ -162,6 +162,7 @@ export async function POST(req: Request) {
     }
 
     const productId = parsePositiveInt(body.productId);
+    const unitId = parsePositiveInt(body.unitId);
     const qtyReceived = parseNonNegativeInt(body.qtyReceived);
     const expiresAt = parseRequiredDate(body.expiresAt);
 
@@ -169,6 +170,10 @@ export async function POST(req: Request) {
 
     if (!productId.ok) {
       errors.productId = "Product is required.";
+    }
+
+    if (!unitId.ok) {
+      errors.unitId = "Unit is required.";
     }
 
     if (!qtyReceived.ok) {
@@ -187,14 +192,30 @@ export async function POST(req: Request) {
       );
     }
 
-    const product = await prisma.product.findUnique({
-      where: { id: productId.value },
-      select: { id: true, name: true, SKU: true },
-    });
+    const [product, unit] = await prisma.$transaction([
+      prisma.product.findUnique({
+        where: { id: productId.value },
+        select: { id: true, name: true, SKU: true },
+      }),
+      prisma.unit.findUnique({
+        where: { id: unitId.value },
+        select: { id: true },
+      }),
+    ]);
 
     if (!product) {
       return NextResponse.json(
-        { error: "Product not found.", fields: { productId: "Product not found." } },
+        {
+          error: "Product not found.",
+          fields: { productId: "Product not found." },
+        },
+        { status: 404 }
+      );
+    }
+
+    if (!unit) {
+      return NextResponse.json(
+        { error: "Unit not found.", fields: { unitId: "Unit not found." } },
         { status: 404 }
       );
     }
@@ -202,6 +223,7 @@ export async function POST(req: Request) {
     const batch = await prisma.batch.create({
       data: {
         productId: product.id,
+        unitId: unit.id,
         qtyReceived: qtyReceived.value,
         qtyRemaining: qtyReceived.value,
         status: BatchStatusType.ACTIVE,

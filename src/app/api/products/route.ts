@@ -63,17 +63,25 @@ export async function GET(req: Request) {
 
     const ids = products.map((p) => p.id);
 
-    const stockSums = !ids.length
+    const batchStocks = !ids.length
       ? []
-      : await prisma.batch.groupBy({
-          by: "productId",
+      : await prisma.batch.findMany({
           where: { productId: { in: ids } },
-          _sum: { qtyRemaining: true },
+          select: {
+            productId: true,
+            qtyRemaining: true,
+            unit: { select: { conversionToBase: true } },
+          },
         });
 
-    const stockByProduct = new Map(
-      stockSums.map((s) => [s.productId, s._sum.qtyRemaining ?? 0])
-    );
+    const stockByProduct = new Map<number, number>();
+    for (const batch of batchStocks) {
+      const multiplier = batch.unit?.conversionToBase ?? 1;
+      const total =
+        (stockByProduct.get(batch.productId) ?? 0) +
+        batch.qtyRemaining * multiplier;
+      stockByProduct.set(batch.productId, total);
+    }
 
     const data = products.map((p) => {
       return {
