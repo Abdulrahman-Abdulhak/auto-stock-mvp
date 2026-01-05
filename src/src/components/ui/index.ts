@@ -9,3 +9,4 @@ export * from "./badge";
 export * from "./dialog";
 export * from "./form";
 export * from "./select";
+export * from "./card";

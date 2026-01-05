@@ -13,6 +13,8 @@ import {
 import { useLocale, useTranslations } from "next-intl";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
+import { cn } from "@lib/cn";
+
 import {
   Button,
   Table,
@@ -37,6 +39,8 @@ type DataTableProps<TData, TValue> = {
 
   totalCount?: number;
   isLoading?: boolean;
+  onRowClick?: (row: TData) => void;
+  getRowClassName?: (row: TData) => string;
 };
 
 function AppTable<TData, TValue>({
@@ -47,6 +51,8 @@ function AppTable<TData, TValue>({
   pagination,
   isLoading,
   totalCount,
+  onRowClick,
+  getRowClassName,
 }: DataTableProps<TData, TValue>) {
   const paginationT = useTranslations("pagination");
   const productsT = useTranslations("products");
@@ -96,7 +102,14 @@ function AppTable<TData, TValue>({
         <TableBody>
           {table.getRowModel().rows?.length ? (
             table.getRowModel().rows.map((row) => (
-              <TableRow key={row.id}>
+              <TableRow
+                key={row.id}
+                className={cn(
+                  onRowClick ? "cursor-pointer" : undefined,
+                  getRowClassName?.(row.original)
+                )}
+                onClick={() => onRowClick?.(row.original)}
+              >
                 {row.getVisibleCells().map((cell) => (
                   <TableCell key={cell.id}>
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}

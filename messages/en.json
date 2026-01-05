@@ -141,6 +141,12 @@
     }
   },
 
+  "dashboard": {
+    "title": "dashboard",
+    "messages": {
+      "selectProductToShowTheirBatches": "select a product to show its batches"
+    }
+  },
   "products": {
     "title": "products",
     "buttons": {

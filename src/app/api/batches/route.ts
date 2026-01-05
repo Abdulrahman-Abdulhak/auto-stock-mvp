@@ -60,6 +60,18 @@ export async function GET(req: Request) {
       .trim()
       .toUpperCase();
     const status = statusParam ? (statusParam as BatchStatusType) : undefined;
+    const productIdParam = url.searchParams.get("productId");
+    const productId =
+      productIdParam == null || productIdParam === ""
+        ? null
+        : toInt(productIdParam, -1);
+
+    if (productId != null && productId <= 0) {
+      return NextResponse.json(
+        { error: "Invalid productId filter." },
+        { status: 400 }
+      );
+    }
 
     const skip = (page - 1) * pageSize;
     const take = pageSize;
@@ -83,6 +95,10 @@ export async function GET(req: Request) {
         );
       }
       where.status = status;
+    }
+
+    if (productId) {
+      where.productId = productId;
     }
 
     const [totalCount, batches] = await prisma.$transaction([
