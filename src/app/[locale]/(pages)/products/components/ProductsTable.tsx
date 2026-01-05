@@ -2,12 +2,15 @@
 
 import type { PaginationState } from "@tanstack/react-table";
 
+import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 
 import { ProductRow } from "./types";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { AppTable } from "@components";
 import { productColumns } from "./productsColumns";
+import ProductRowActions from "./ProductRowActions";
+import SellProductDialog from "./SellProductDialog";
 
 type FetchedData = {
   data: ProductRow[];
@@ -58,6 +61,8 @@ function ProductsTable() {
   const router = useRouter();
   const pathname = usePathname();
   const sp = useSearchParams();
+  const [sellOpen, setSellOpen] = useState(false);
+  const [sellProduct, setSellProduct] = useState<ProductRow | null>(null);
 
   const page = clampInt(sp.get("page"), 1, 1_000_000);
   const pageSize = clampInt(sp.get("pageSize"), 20, 200);
@@ -115,16 +120,42 @@ function ProductsTable() {
     setParams(updates);
   };
 
+  const columns = useMemo(
+    () => [
+      ...productColumns,
+      {
+        id: "actions",
+        header: "",
+        cell: ({ row }: { row: { original: ProductRow } }) => (
+          <ProductRowActions
+            onSell={() => {
+              setSellProduct(row.original);
+              setSellOpen(true);
+            }}
+          />
+        ),
+      },
+    ],
+    []
+  );
+
   return (
-    <AppTable
-      columns={productColumns}
-      data={rows}
-      pageCount={pageInfo?.totalPages ?? 1}
-      pagination={pagination}
-      onPaginationChange={onPaginationChange}
-      totalCount={pageInfo?.totalCount}
-      isLoading={isLoading || isFetching}
-    />
+    <>
+      <AppTable
+        columns={columns}
+        data={rows}
+        pageCount={pageInfo?.totalPages ?? 1}
+        pagination={pagination}
+        onPaginationChange={onPaginationChange}
+        totalCount={pageInfo?.totalCount}
+        isLoading={isLoading || isFetching}
+      />
+      <SellProductDialog
+        open={sellOpen}
+        onOpenChange={setSellOpen}
+        initialProduct={sellProduct}
+      />
+    </>
   );
 }
 

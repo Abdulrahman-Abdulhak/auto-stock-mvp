@@ -57,10 +57,12 @@
     },
     "productSelect": {
       "labels": {
-        "createNewBatch": "product"
+        "createNewBatch": "product",
+        "sellProduct": "product"
       },
       "placeholders": {
-        "createNewBatch": "create batch"
+        "createNewBatch": "create batch",
+        "sellProduct": "select product"
       }
     },
     "unitSelect": {
@@ -81,10 +83,25 @@
         "createNewBatch": "expiry date"
       }
     },
+    "qtyToSell": {
+      "labels": {
+        "sellProduct": "amount to sell"
+      }
+    },
     "submit": {
       "labels": {
         "createNewProduct": "create product",
         "createNewBatch": "create batch"
+      }
+    },
+    "sell": {
+      "buttons": {
+        "submit": "sell"
+      },
+      "popups": {
+        "title": "sell product",
+        "resultTitle": "sell result",
+        "emptyResult": "No batches selected."
       }
     },
 
@@ -111,6 +128,10 @@
       },
       "unitId": {
         "required": "Unit is required"
+      },
+      "qtyToSell": {
+        "integer": "Amount to sell must be an integer",
+        "min": "Amount to sell must be at least 1"
       },
       "expiresAt": {
         "required": "Expiration date is required",

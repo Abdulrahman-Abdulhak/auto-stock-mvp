@@ -10,6 +10,8 @@ import { Searchbar } from "@components";
 
 import { productColumns } from "../../products/components/productsColumns";
 import { ProductRow } from "../../products/components/types";
+import ProductRowActions from "../../products/components/ProductRowActions";
+import SellProductDialog from "../../products/components/SellProductDialog";
 import { batchColumns } from "../../batches/components/batchesColumns";
 import { BatchRow } from "../../batches/components/types";
 import { useTranslations } from "next-intl";
@@ -87,6 +89,8 @@ function DashboardTables() {
   const [selectedProductId, setSelectedProductId] = useState<number | null>(
     null
   );
+  const [sellOpen, setSellOpen] = useState(false);
+  const [sellProduct, setSellProduct] = useState<ProductRow | null>(null);
   const [productPagination, setProductPagination] = useState<PaginationState>({
     pageIndex: 0,
     pageSize: 20,
@@ -145,6 +149,25 @@ function DashboardTables() {
     return productRows.find((p) => p.id === selectedProductId) ?? null;
   }, [productRows, selectedProductId]);
 
+  const columns = useMemo(
+    () => [
+      ...productColumns,
+      {
+        id: "actions",
+        header: "",
+        cell: ({ row }: { row: { original: ProductRow } }) => (
+          <ProductRowActions
+            onSell={() => {
+              setSellProduct(row.original);
+              setSellOpen(true);
+            }}
+          />
+        ),
+      },
+    ],
+    []
+  );
+
   return (
     <div className="flex flex-col gap-8">
       <section className="flex flex-col gap-3">
@@ -163,7 +186,7 @@ function DashboardTables() {
           </div>
         </header>
         <AppTable
-          columns={productColumns}
+          columns={columns}
           data={productRows}
           pageCount={productPageInfo?.totalPages ?? 1}
           pagination={productPagination}
@@ -198,6 +221,11 @@ function DashboardTables() {
           isLoading={batchesQuery.isLoading || batchesQuery.isFetching}
         />
       </section>
+      <SellProductDialog
+        open={sellOpen}
+        onOpenChange={setSellOpen}
+        initialProduct={sellProduct}
+      />
     </div>
   );
 }
