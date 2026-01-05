@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-import { BatchStatusType } from "@generated/prisma/client";
+import { BatchStatusType, Prisma } from "@generated/prisma/client";
 import { prisma } from "@lib/prisma";
 
 function parsePositiveInt(value: unknown) {
@@ -47,12 +47,126 @@ export async function POST(req: Request) {
       );
     }
 
-    const product = await prisma.product.findUnique({
-      where: { id: productId.value },
-      select: { id: true },
-    });
+    const result = await prisma.$transaction(
+      async (tx) => {
+        const product = await tx.product.findUnique({
+          where: { id: productId.value },
+          select: { id: true },
+        });
 
-    if (!product) {
+        if (!product) {
+          return { type: "not_found" as const };
+        }
+
+        const now = new Date();
+        const batches = await tx.batch.findMany({
+          where: {
+            productId: product.id,
+            status: BatchStatusType.ACTIVE,
+            expiresAt: { gte: now },
+            qtyRemaining: { gt: 0 },
+          },
+          orderBy: { expiresAt: "asc" },
+          select: {
+            id: true,
+            expiresAt: true,
+            qtyRemaining: true,
+            qtyReceived: true,
+            unitId: true,
+            unit: {
+              select: {
+                id: true,
+                baseUnitId: true,
+                conversionToBase: true,
+              },
+            },
+          },
+        });
+
+        if (!batches.length) {
+          return { type: "no_batches" as const };
+        }
+
+        let remaining = qtyToSell.value;
+        const allocations: {
+          batchId: number;
+          expiresAt: Date;
+          qtyInBase: number;
+        }[] = [];
+
+        const updates: {
+          id: number;
+          unitId: number | null;
+          qtyRemaining: number;
+          qtyReceived: number;
+          expectedUnitId: number | null;
+          expectedQtyRemaining: number;
+        }[] = [];
+
+        for (const batch of batches) {
+          if (remaining <= 0) break;
+          const conversion = batch.unit?.conversionToBase ?? 1;
+          const availableBase = batch.qtyRemaining * conversion;
+          if (availableBase <= 0) continue;
+
+          const take = Math.min(availableBase, remaining);
+          remaining -= take;
+
+          const baseUnitId =
+            batch.unit?.baseUnitId ?? batch.unit?.id ?? batch.unitId ?? null;
+
+          if (batch.unit && !baseUnitId) {
+            return { type: "missing_base_unit" as const };
+          }
+
+          const newRemainingBase = availableBase - take;
+          const newReceivedBase = batch.qtyReceived * conversion;
+
+          updates.push({
+            id: batch.id,
+            unitId: baseUnitId,
+            qtyRemaining: newRemainingBase,
+            qtyReceived: newReceivedBase,
+            expectedUnitId: batch.unitId,
+            expectedQtyRemaining: batch.qtyRemaining,
+          });
+
+          allocations.push({
+            batchId: batch.id,
+            expiresAt: batch.expiresAt,
+            qtyInBase: take,
+          });
+        }
+
+        if (remaining > 0) {
+          return { type: "insufficient" as const };
+        }
+
+        for (const update of updates) {
+          const res = await tx.batch.updateMany({
+            where: {
+              id: update.id,
+              unitId: update.expectedUnitId,
+              qtyRemaining: update.expectedQtyRemaining,
+            },
+            data: {
+              unitId: update.unitId,
+              qtyRemaining: update.qtyRemaining,
+              qtyReceived: update.qtyReceived,
+            },
+          });
+
+          if (res.count !== 1) {
+            return { type: "conflict" as const };
+          }
+        }
+
+        return { type: "ok" as const, allocations };
+      },
+      { isolationLevel: Prisma.TransactionIsolationLevel.Serializable }
+    );
+
+    if (result.type === "not_found") {
       return NextResponse.json(
         {
           error: "Product not found.",
@@ -62,117 +176,38 @@ export async function POST(req: Request) {
       );
     }
 
-    const now = new Date();
-    const batches = await prisma.batch.findMany({
-      where: {
-        productId: product.id,
-        status: BatchStatusType.ACTIVE,
-        expiresAt: { gte: now },
-        qtyRemaining: { gt: 0 },
-      },
-      orderBy: { expiresAt: "asc" },
-      select: {
-        id: true,
-        expiresAt: true,
-        qtyRemaining: true,
-        qtyReceived: true,
-        unit: {
-          select: {
-            id: true,
-            baseUnitId: true,
-            conversionToBase: true,
-          },
-        },
-      },
-    });
+    if (result.type === "missing_base_unit") {
+      return NextResponse.json(
+        { error: "Batch unit is missing a base unit mapping." },
+        { status: 500 }
+      );
+    }
 
-    if (!batches.length) {
+    if (result.type === "no_batches") {
       return NextResponse.json(
         { error: "No non-expired batches available for this product." },
         { status: 409 }
       );
     }
 
-    let remaining = qtyToSell.value;
-    const allocations: {
-      batchId: number;
-      expiresAt: Date;
-      qtyInBase: number;
-    }[] = [];
-
-    const updates: {
-      id: number;
-      unitId: number | null;
-      qtyRemaining: number;
-      qtyReceived: number;
-    }[] = [];
-
-    for (const batch of batches) {
-      if (remaining <= 0) break;
-      const conversion = batch.unit?.conversionToBase ?? 1;
-      const availableBase = batch.qtyRemaining * conversion;
-      if (availableBase <= 0) continue;
-
-      const take = Math.min(availableBase, remaining);
-      remaining -= take;
-
-      const baseUnitId =
-        batch.unit?.baseUnitId === null
-          ? batch.unit.id
-          : batch.unit?.baseUnitId ?? null;
-
-      if (
-        batch.unit &&
-        batch.unit.baseUnitId !== null &&
-        !batch.unit.baseUnitId
-      ) {
-        return NextResponse.json(
-          { error: "Batch unit is missing a base unit mapping." },
-          { status: 500 }
-        );
-      }
-
-      const newRemainingBase = availableBase - take;
-      const newReceivedBase = batch.qtyReceived * conversion;
-
-      updates.push({
-        id: batch.id,
-        unitId: baseUnitId ?? batch.unit?.id ?? null,
-        qtyRemaining: newRemainingBase,
-        qtyReceived: newReceivedBase,
-      });
-
-      allocations.push({
-        batchId: batch.id,
-        expiresAt: batch.expiresAt,
-        qtyInBase: take,
-      });
-    }
-
-    if (remaining > 0) {
+    if (result.type === "insufficient") {
       return NextResponse.json(
         { error: "Insufficient non-expired stock to fulfill the sale." },
         { status: 409 }
       );
     }
 
-    await prisma.$transaction(
-      updates.map((update) =>
-        prisma.batch.update({
-          where: { id: update.id },
-          data: {
-            unitId: update.unitId,
-            qtyRemaining: update.qtyRemaining,
-            qtyReceived: update.qtyReceived,
-          },
-        })
-      )
-    );
+    if (result.type === "conflict") {
+      return NextResponse.json(
+        { error: "Stock changed, please retry the sale." },
+        { status: 409 }
+      );
+    }
 
     return NextResponse.json(
       {
         data: {
-          allocations: allocations.map((allocation) => ({
+          allocations: result.allocations.map((allocation) => ({
             batchId: allocation.batchId,
             expiresAt: allocation.expiresAt,
             qtyInBase: allocation.qtyInBase,
