@@ -29,8 +29,4 @@ export const navLinks = [
     label: "transactions.label",
     href: "/transactions",
   },
-  {
-    label: "reports.label",
-    href: "/reports",
-  },
 ];

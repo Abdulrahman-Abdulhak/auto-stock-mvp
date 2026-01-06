@@ -10,3 +10,4 @@ export * from "./dialog";
 export * from "./form";
 export * from "./select";
 export * from "./card";
+export * from "./skeleton";

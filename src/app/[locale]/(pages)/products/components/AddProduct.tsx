@@ -3,7 +3,7 @@
 import { z } from "zod";
 
 import { useState } from "react";
-import { PlusIcon } from "lucide-react";
+import { Loader2, PlusIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -247,7 +247,11 @@ function AddProduct() {
                 className="capitalize"
                 disabled={createProduct.isPending}
               >
-                {formT("submit.labels.createNewProduct")}
+                {createProduct.isPending ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  formT("submit.labels.createNewProduct")
+                )}
               </Button>
             </div>
           </form>

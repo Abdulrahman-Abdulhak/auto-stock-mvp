@@ -3,7 +3,7 @@
 import { z } from "zod";
 
 import { useState } from "react";
-import { PlusIcon } from "lucide-react";
+import { Loader2, PlusIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -388,7 +388,11 @@ function AddBatch() {
                 className="capitalize"
                 disabled={createBatch.isPending}
               >
-                {formT("submit.labels.createNewBatch")}
+                {createBatch.isPending ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  formT("submit.labels.createNewBatch")
+                )}
               </Button>
             </div>
           </form>

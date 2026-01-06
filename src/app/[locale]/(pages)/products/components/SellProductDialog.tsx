@@ -3,6 +3,7 @@
 import { z } from "zod";
 
 import { useEffect, useMemo, useState } from "react";
+import { Loader2 } from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
@@ -297,7 +298,11 @@ function SellProductDialog({
                   className="capitalize"
                   disabled={sellMutation.isPending}
                 >
-                  {formT("sell.buttons.submit")}
+                  {sellMutation.isPending ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    formT("sell.buttons.submit")
+                  )}
                 </Button>
               </div>
             </form>

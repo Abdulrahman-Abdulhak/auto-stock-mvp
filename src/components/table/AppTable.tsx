@@ -17,6 +17,7 @@ import { cn } from "@lib/cn";
 
 import {
   Button,
+  Skeleton,
   Table,
   TableBody,
   TableCell,
@@ -101,7 +102,19 @@ function AppTable<TData, TValue>({
           ))}
         </TableHeader>
         <TableBody>
-          {table.getRowModel().rows?.length ? (
+          {isLoading ? (
+            Array.from({ length: Math.min(5, pagination.pageSize) }).map(
+              (_, idx) => (
+                <TableRow key={`skeleton-${idx}`}>
+                  {Array.from({ length: columns.length }).map((__, cellIdx) => (
+                    <TableCell key={`skeleton-${idx}-${cellIdx}`}>
+                      <Skeleton className="h-4 w-full" />
+                    </TableCell>
+                  ))}
+                </TableRow>
+              )
+            )
+          ) : table.getRowModel().rows?.length ? (
             table.getRowModel().rows.map((row) => (
               <TableRow
                 key={row.id}
