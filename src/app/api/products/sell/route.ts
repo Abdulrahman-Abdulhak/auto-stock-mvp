@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 
-import { BatchStatusType, Prisma } from "@generated/prisma/client";
+import { BatchStatusType, Prisma, TransactionType } from "@generated/prisma/client";
 import { prisma } from "@lib/prisma";
+import { getDefaultUserId } from "@app/api/utils";
 
 function parsePositiveInt(value: unknown) {
   if (value == null || value === "") {
@@ -58,6 +59,7 @@ export async function POST(req: Request) {
           return { type: "not_found" as const };
         }
 
+        const createdById = await getDefaultUserId(tx);
         const now = new Date();
         const batches = await tx.batch.findMany({
           where: {
@@ -160,6 +162,20 @@ export async function POST(req: Request) {
             return { type: "conflict" as const };
           }
         }
+
+        await Promise.all(
+          allocations.map((allocation) =>
+            tx.transaction.create({
+              data: {
+                type: TransactionType.OUT,
+                productId: product.id,
+                batchId: allocation.batchId,
+                qty: allocation.qtyInBase,
+                createdById,
+              },
+            })
+          )
+        );
 
         return { type: "ok" as const, allocations };
       },

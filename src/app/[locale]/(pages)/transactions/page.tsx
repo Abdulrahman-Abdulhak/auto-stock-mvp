@@ -1,3 +1,10 @@
+import { Header, TransactionsTable } from "./components";
+
 export default function TransactionsPage() {
-  return <div>Transactions</div>;
+  return (
+    <div>
+      <Header />
+      <TransactionsTable />
+    </div>
+  );
 }

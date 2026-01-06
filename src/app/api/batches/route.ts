@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 
-import { Prisma, BatchStatusType } from "@generated/prisma/client";
+import { Prisma, BatchStatusType, TransactionType } from "@generated/prisma/client";
 import { prisma } from "@lib/prisma";
+import { getDefaultUserId } from "@app/api/utils";
 
 function toInt(value: string | null, fallback: number) {
   if (value == null || value === "") return fallback;
@@ -208,18 +209,67 @@ export async function POST(req: Request) {
       );
     }
 
-    const [product, unit] = await prisma.$transaction([
-      prisma.product.findUnique({
-        where: { id: productId.value },
-        select: { id: true, name: true, SKU: true },
-      }),
-      prisma.unit.findUnique({
-        where: { id: unitId.value },
-        select: { id: true },
-      }),
-    ]);
+    const result = await prisma.$transaction(async (tx) => {
+      const [product, unit] = await Promise.all([
+        tx.product.findUnique({
+          where: { id: productId.value },
+          select: { id: true, name: true, SKU: true },
+        }),
+        tx.unit.findUnique({
+          where: { id: unitId.value },
+          select: { id: true },
+        }),
+      ]);
 
-    if (!product) {
+      if (!product) {
+        return { type: "product_missing" as const };
+      }
+
+      if (!unit) {
+        return { type: "unit_missing" as const };
+      }
+
+      const createdById = await getDefaultUserId(tx);
+      const batch = await tx.batch.create({
+        data: {
+          productId: product.id,
+          unitId: unit.id,
+          qtyReceived: qtyReceived.value,
+          qtyRemaining: qtyReceived.value,
+          status: BatchStatusType.ACTIVE,
+          expiresAt: expiresAt.value!,
+        },
+        select: {
+          id: true,
+          status: true,
+          qtyReceived: true,
+          qtyRemaining: true,
+          expiresAt: true,
+          updatedAt: true,
+          product: {
+            select: {
+              id: true,
+              name: true,
+              SKU: true,
+            },
+          },
+        },
+      });
+
+      await tx.transaction.create({
+        data: {
+          type: TransactionType.IN,
+          productId: product.id,
+          batchId: batch.id,
+          qty: qtyReceived.value,
+          createdById,
+        },
+      });
+
+      return { type: "ok" as const, batch };
+    });
+
+    if (result.type === "product_missing") {
       return NextResponse.json(
         {
           error: "Product not found.",
@@ -229,38 +279,14 @@ export async function POST(req: Request) {
       );
     }
 
-    if (!unit) {
+    if (result.type === "unit_missing") {
       return NextResponse.json(
         { error: "Unit not found.", fields: { unitId: "Unit not found." } },
         { status: 404 }
       );
     }
 
-    const batch = await prisma.batch.create({
-      data: {
-        productId: product.id,
-        unitId: unit.id,
-        qtyReceived: qtyReceived.value,
-        qtyRemaining: qtyReceived.value,
-        status: BatchStatusType.ACTIVE,
-        expiresAt: expiresAt.value!,
-      },
-      select: {
-        id: true,
-        status: true,
-        qtyReceived: true,
-        qtyRemaining: true,
-        expiresAt: true,
-        updatedAt: true,
-        product: {
-          select: {
-            id: true,
-            name: true,
-            SKU: true,
-          },
-        },
-      },
-    });
+    const batch = result.batch;
 
     return NextResponse.json(
       {

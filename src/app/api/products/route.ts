@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@lib/prisma";
-import { Prisma } from "@generated/prisma/client";
+import { Prisma, TransactionType } from "@generated/prisma/client";
+import { getDefaultUserId } from "@app/api/utils";
 
 function toInt(value: string | null, fallback: number) {
   const n = Number(value);
@@ -171,8 +172,9 @@ export async function POST(req: Request) {
       now.getDate()
     );
 
-    const [product] = await prisma.$transaction([
-      prisma.product.create({
+    const product = await prisma.$transaction(async (tx) => {
+      const createdById = await getDefaultUserId(tx);
+      const product = await tx.product.create({
         data: {
           name,
           SKU: sku,
@@ -185,20 +187,32 @@ export async function POST(req: Request) {
           minStockLevel: true,
           updatedAt: true,
         },
-      }),
-      ...(currentStock.value > 0
-        ? [
-            prisma.batch.create({
-              data: {
-                product: { connect: { SKU: sku } },
-                qtyReceived: currentStock.value,
-                qtyRemaining: currentStock.value,
-                expiresAt,
-              },
-            }),
-          ]
-        : []),
-    ]);
+      });
+
+      if (currentStock.value > 0) {
+        const batch = await tx.batch.create({
+          data: {
+            productId: product.id,
+            qtyReceived: currentStock.value,
+            qtyRemaining: currentStock.value,
+            expiresAt,
+          },
+          select: { id: true },
+        });
+
+        await tx.transaction.create({
+          data: {
+            type: TransactionType.IN,
+            productId: product.id,
+            batchId: batch.id,
+            qty: currentStock.value,
+            createdById,
+          },
+        });
+      }
+
+      return product;
+    });
 
     return NextResponse.json(
       {

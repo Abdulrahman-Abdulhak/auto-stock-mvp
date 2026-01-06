@@ -20,7 +20,8 @@
       "placeholders": {
         "products": "search products...",
         "batches": "search batches...",
-        "createNewBatch": "search products..."
+        "createNewBatch": "search products...",
+        "transactions": "search products..."
       }
     },
     "name": {
@@ -190,5 +191,8 @@
         "title": "create new batch"
       }
     }
+  },
+  "transactions": {
+    "title": "transactions"
   }
 }
