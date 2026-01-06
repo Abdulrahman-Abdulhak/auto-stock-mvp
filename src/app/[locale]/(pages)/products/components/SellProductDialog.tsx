@@ -145,7 +145,11 @@ function SellProductDialog({
     const hasInitial = options.some((p) => p.id === initialProduct.id);
     if (hasInitial) return options;
     return [
-      { id: initialProduct.id, name: initialProduct.name, sku: initialProduct.sku },
+      {
+        id: initialProduct.id,
+        name: initialProduct.name,
+        sku: initialProduct.sku,
+      },
       ...options,
     ];
   }, [initialProduct, productsQuery.data]);
@@ -240,11 +244,14 @@ function SellProductDialog({
                           ) : null}
                           {productsQuery.isError ? (
                             <SelectItem value="error" disabled>
-                              Failed to load products
+                              {commonT("state.failedToLoadProducts")}
                             </SelectItem>
                           ) : null}
                           {productOptions.map((product) => (
-                            <SelectItem key={product.id} value={`${product.id}`}>
+                            <SelectItem
+                              key={product.id}
+                              value={`${product.id}`}
+                            >
                               {product.name} ({product.sku})
                             </SelectItem>
                           ))}
@@ -311,7 +318,9 @@ function SellProductDialog({
                   className="flex items-center justify-between gap-3"
                 >
                   <div className="font-mono text-xs">
-                    Batch {allocation.batchId}
+                    {formT("sell.popups.batchLabel", {
+                      id: allocation.batchId,
+                    })}
                   </div>
                   <div className="text-muted-foreground">
                     {new Date(allocation.expiresAt).toLocaleDateString()}

@@ -278,7 +278,7 @@ function AddBatch() {
                         ) : null}
                         {productsQuery.isError ? (
                           <SelectItem value="error" disabled>
-                            Failed to load products
+                            {commonT("state.failedToLoadProducts")}
                           </SelectItem>
                         ) : null}
                         {productOptions.map((product) => (
@@ -322,7 +322,7 @@ function AddBatch() {
                         ) : null}
                         {unitsQuery.isError ? (
                           <SelectItem value="error" disabled>
-                            Failed to load units
+                            {commonT("state.failedToLoadUnits")}
                           </SelectItem>
                         ) : null}
                         {unitOptions.map((unit) => (

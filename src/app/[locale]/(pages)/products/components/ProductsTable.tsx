@@ -4,11 +4,12 @@ import type { PaginationState } from "@tanstack/react-table";
 
 import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { useTranslations } from "next-intl";
 
 import { ProductRow } from "./types";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { AppTable } from "@components";
-import { productColumns } from "./productsColumns";
+import { getProductColumns } from "./productsColumns";
 import ProductRowActions from "./ProductRowActions";
 import SellProductDialog from "./SellProductDialog";
 
@@ -61,6 +62,7 @@ function ProductsTable() {
   const router = useRouter();
   const pathname = usePathname();
   const sp = useSearchParams();
+  const productsT = useTranslations("products");
   const [sellOpen, setSellOpen] = useState(false);
   const [sellProduct, setSellProduct] = useState<ProductRow | null>(null);
 
@@ -122,7 +124,7 @@ function ProductsTable() {
 
   const columns = useMemo(
     () => [
-      ...productColumns,
+      ...getProductColumns(productsT),
       {
         id: "actions",
         header: "",
@@ -136,7 +138,7 @@ function ProductsTable() {
         ),
       },
     ],
-    []
+    [productsT]
   );
 
   return (

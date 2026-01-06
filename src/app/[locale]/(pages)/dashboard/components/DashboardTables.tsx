@@ -8,11 +8,11 @@ import { useQuery } from "@tanstack/react-query";
 import { AppTable } from "@components";
 import { Searchbar } from "@components";
 
-import { productColumns } from "../../products/components/productsColumns";
+import { getProductColumns } from "../../products/components/productsColumns";
 import { ProductRow } from "../../products/components/types";
 import ProductRowActions from "../../products/components/ProductRowActions";
 import SellProductDialog from "../../products/components/SellProductDialog";
-import { batchColumns } from "../../batches/components/batchesColumns";
+import { getBatchColumns } from "../../batches/components/batchesColumns";
 import { BatchRow } from "../../batches/components/types";
 import { useTranslations } from "next-intl";
 
@@ -151,7 +151,7 @@ function DashboardTables() {
 
   const columns = useMemo(
     () => [
-      ...productColumns,
+      ...getProductColumns(productsT),
       {
         id: "actions",
         header: "",
@@ -165,7 +165,7 @@ function DashboardTables() {
         ),
       },
     ],
-    []
+    [productsT]
   );
 
   return (
@@ -210,9 +210,17 @@ function DashboardTables() {
           {selectedProduct === null && (
             <p>{t("messages.selectProductToShowTheirBatches")}</p>
           )}
+          {selectedProduct !== null && (
+            <p>
+              {t("messages.batchesFor", {
+                name: selectedProduct.name,
+                sku: selectedProduct.sku,
+              })}
+            </p>
+          )}
         </header>
         <AppTable
-          columns={batchColumns}
+          columns={getBatchColumns(batchesT)}
           data={batchRows}
           pageCount={batchPageInfo?.totalPages ?? 1}
           pagination={batchPagination}

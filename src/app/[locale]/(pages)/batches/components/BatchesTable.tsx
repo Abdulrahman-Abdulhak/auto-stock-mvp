@@ -7,7 +7,8 @@ import { useQuery } from "@tanstack/react-query";
 import { BatchRow } from "./types";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { AppTable } from "@components";
-import { batchColumns } from "./batchesColumns";
+import { useTranslations } from "next-intl";
+import { getBatchColumns } from "./batchesColumns";
 
 type FetchedData = {
   data: BatchRow[];
@@ -61,6 +62,7 @@ function BatchesTable() {
   const router = useRouter();
   const pathname = usePathname();
   const sp = useSearchParams();
+  const batchesT = useTranslations("batches");
 
   const page = clampInt(sp.get("page"), 1, 1, 1_000_000);
   const pageSize = clampInt(sp.get("pageSize"), 20, 1, 200);
@@ -128,7 +130,7 @@ function BatchesTable() {
 
   return (
     <AppTable
-      columns={batchColumns}
+      columns={getBatchColumns(batchesT)}
       data={rows}
       pageCount={pageInfo?.totalPages ?? 1}
       pagination={pagination}

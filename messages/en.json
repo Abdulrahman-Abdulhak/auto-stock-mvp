@@ -3,11 +3,16 @@
     "state": {
       "error": "An unexpected error occurred",
       "success": "Completed successfully",
-      "loading": "Loading..."
+      "loading": "Loading...",
+      "failedToLoadProducts": "Failed to load products",
+      "failedToLoadUnits": "Failed to load units"
     },
 
     "buttons": {
       "cancel": "cancel"
+    },
+    "table": {
+      "noResults": "No results."
     }
   },
   "pagination": {
@@ -102,7 +107,8 @@
       "popups": {
         "title": "sell product",
         "resultTitle": "sell result",
-        "emptyResult": "No batches selected."
+        "emptyResult": "No batches selected.",
+        "batchLabel": "Batch {id}"
       }
     },
 
@@ -165,12 +171,35 @@
 
   "dashboard": {
     "title": "dashboard",
+    "cards": {
+      "totalProducts": "Total products",
+      "totalStock": "Total stock (base units)",
+      "lowStockProducts": "Low stock products",
+      "expiredItems": "Expired items"
+    },
     "messages": {
-      "selectProductToShowTheirBatches": "select a product to show its batches"
+      "selectProductToShowTheirBatches": "select a product to show its batches",
+      "batchesFor": "Batches for {name} ({sku})"
     }
   },
   "products": {
     "title": "products",
+    "columns": {
+      "sku": "SKU",
+      "name": "Product",
+      "stock": "Stock"
+    },
+    "labels": {
+      "updatedAt": "Updated {date}",
+      "minStock": "min {min}"
+    },
+    "badges": {
+      "lowStock": "Low stock"
+    },
+    "actions": {
+      "rowActions": "Row actions",
+      "sell": "Sell"
+    },
     "buttons": {
       "addProduct": "add new product"
     },
@@ -183,6 +212,22 @@
   "batches": {
     "title": "batches",
     "description": "Manage individual batches in your inventory.",
+    "columns": {
+      "batchId": "Batch ID",
+      "sku": "SKU",
+      "product": "Product",
+      "status": "Status",
+      "remaining": "Remaining",
+      "received": "Received",
+      "expires": "Expires"
+    },
+    "labels": {
+      "updatedAt": "Updated {date}"
+    },
+    "badges": {
+      "expired": "Expired",
+      "aboutToExpire": "About to expire"
+    },
     "buttons": {
       "createNewBatch": "create new batch"
     },
@@ -193,6 +238,17 @@
     }
   },
   "transactions": {
-    "title": "transactions"
+    "title": "transactions",
+    "columns": {
+      "type": "Type",
+      "sku": "SKU",
+      "product": "Product",
+      "qty": "Qty",
+      "batch": "Batch"
+    },
+    "labels": {
+      "createdAt": "{date}",
+      "noExpiry": "No expiry"
+    }
   }
 }

@@ -1,4 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@shadecn";
+import { useTranslations } from "next-intl";
 
 type StatusData = {
   totalProducts: number;
@@ -12,11 +13,15 @@ type StatusProps = {
 };
 
 function Status({ data }: StatusProps) {
+  const dashboardT = useTranslations("dashboard");
+
   return (
     <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
       <Card className="border-blue-500/40 bg-blue-500/10">
         <CardHeader>
-          <CardTitle className="text-blue-700">Total products</CardTitle>
+          <CardTitle className="text-blue-700">
+            {dashboardT("cards.totalProducts")}
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="text-3xl font-semibold text-blue-700">
@@ -27,7 +32,7 @@ function Status({ data }: StatusProps) {
       <Card className="border-emerald-500/40 bg-emerald-500/10">
         <CardHeader>
           <CardTitle className="text-emerald-700">
-            Total stock (base units)
+            {dashboardT("cards.totalStock")}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -38,7 +43,9 @@ function Status({ data }: StatusProps) {
       </Card>
       <Card className="border-amber-500/50 bg-amber-500/10">
         <CardHeader>
-          <CardTitle className="text-amber-700">Low stock products</CardTitle>
+          <CardTitle className="text-amber-700">
+            {dashboardT("cards.lowStockProducts")}
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="text-3xl font-semibold text-amber-700">
@@ -48,7 +55,9 @@ function Status({ data }: StatusProps) {
       </Card>
       <Card className="border-red-500/40 bg-red-500/10">
         <CardHeader>
-          <CardTitle className="text-red-700">Expired items</CardTitle>
+          <CardTitle className="text-red-700">
+            {dashboardT("cards.expiredItems")}
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="text-3xl font-semibold text-red-700">

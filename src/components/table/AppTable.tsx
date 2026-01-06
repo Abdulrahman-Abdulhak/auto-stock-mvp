@@ -56,6 +56,7 @@ function AppTable<TData, TValue>({
 }: DataTableProps<TData, TValue>) {
   const paginationT = useTranslations("pagination");
   const productsT = useTranslations("products");
+  const commonT = useTranslations("common");
 
   const locale = useLocale();
 
@@ -123,7 +124,7 @@ function AppTable<TData, TValue>({
                 colSpan={columns.length}
                 className="h-24 text-center text-muted-foreground"
               >
-                No results.
+                {commonT("table.noResults")}
               </TableCell>
             </TableRow>
           )}

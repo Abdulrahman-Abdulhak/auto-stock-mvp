@@ -3,11 +3,12 @@
 import type { PaginationState } from "@tanstack/react-table";
 
 import { useQuery } from "@tanstack/react-query";
+import { useTranslations } from "next-intl";
 
 import { TransactionRow } from "./types";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { AppTable } from "@components";
-import { transactionColumns } from "./transactionsColumns";
+import { getTransactionColumns } from "./transactionsColumns";
 
 type FetchedData = {
   data: TransactionRow[];
@@ -59,6 +60,7 @@ function TransactionsTable() {
   const router = useRouter();
   const pathname = usePathname();
   const sp = useSearchParams();
+  const transactionsT = useTranslations("transactions");
 
   const page = clampInt(sp.get("page"), 1, 1, 1_000_000);
   const pageSize = clampInt(sp.get("pageSize"), 20, 1, 200);
@@ -119,7 +121,7 @@ function TransactionsTable() {
 
   return (
     <AppTable
-      columns={transactionColumns}
+      columns={getTransactionColumns(transactionsT)}
       data={rows}
       pageCount={pageInfo?.totalPages ?? 1}
       pagination={pagination}

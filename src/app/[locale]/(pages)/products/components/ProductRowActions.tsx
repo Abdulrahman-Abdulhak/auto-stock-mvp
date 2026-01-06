@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { MoreHorizontal } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 import { Button } from "@shadecn";
 
@@ -12,6 +13,7 @@ type ProductRowActionsProps = {
 function ProductRowActions({ onSell }: ProductRowActionsProps) {
   const [open, setOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const productsT = useTranslations("products");
 
   useEffect(() => {
     if (!open) return;
@@ -35,7 +37,7 @@ function ProductRowActions({ onSell }: ProductRowActionsProps) {
         type="button"
         variant="ghost"
         size="icon-sm"
-        aria-label="Row actions"
+        aria-label={productsT("actions.rowActions")}
         onClick={(event) => {
           event.stopPropagation();
           setOpen((prev) => !prev);
@@ -55,7 +57,7 @@ function ProductRowActions({ onSell }: ProductRowActionsProps) {
               onSell();
             }}
           >
-            Sell
+            {productsT("actions.sell")}
           </Button>
         </div>
       ) : null}
