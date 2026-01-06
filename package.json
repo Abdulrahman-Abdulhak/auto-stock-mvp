@@ -3,9 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "predev": "npm run gen:icons",
     "dev": "next dev --webpack",
-    "prebuild": "npm run gen:icons",
     "build": "next build --webpack",
     "start": "next start",
     "lint": "eslint",

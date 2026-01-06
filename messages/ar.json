@@ -1,0 +1,250 @@
+{
+  "common": {
+    "state": {
+      "error": "حدث خطأ غير متوقع",
+      "success": "تم بنجاح",
+      "loading": "جارٍ التحميل...",
+      "failedToLoadProducts": "فشل تحميل المنتجات",
+      "failedToLoadUnits": "فشل تحميل الوحدات"
+    },
+    "buttons": {
+      "cancel": "إلغاء"
+    },
+    "table": {
+      "noResults": "لا توجد نتائج."
+    }
+  },
+  "pagination": {
+    "pageXofN": "الصفحة {x} من {n}",
+    "showingXofN": "عرض {x} من {n}",
+    "labeledShowingXofN": "عرض {x} من {n} {label}"
+  },
+  "form": {
+    "search": {
+      "placeholders": {
+        "products": "ابحث عن المنتجات...",
+        "batches": "ابحث عن الدُفعات...",
+        "createNewBatch": "ابحث عن المنتجات...",
+        "transactions": "ابحث عن المنتجات..."
+      }
+    },
+    "name": {
+      "labels": {
+        "createNewProduct": "اسم المنتج"
+      },
+      "placeholders": {
+        "createNewProduct": "أدخل اسم المنتج"
+      }
+    },
+    "sku": {
+      "labels": {
+        "createNewProduct": "رمز SKU"
+      },
+      "placeholders": {
+        "createNewProduct": "أدخل رمز SKU"
+      }
+    },
+    "minStockLevel": {
+      "labels": {
+        "createNewProduct": "الحد الأدنى للمخزون"
+      },
+      "placeholders": {
+        "createNewProduct": "أدخل الحد الأدنى للمخزون"
+      }
+    },
+    "currentStock": {
+      "labels": {
+        "createNewProduct": "المخزون الحالي"
+      },
+      "placeholders": {
+        "createNewProduct": "أدخل الحد الأدنى للمخزون"
+      }
+    },
+    "productSelect": {
+      "labels": {
+        "createNewBatch": "المنتج",
+        "sellProduct": "المنتج"
+      },
+      "placeholders": {
+        "createNewBatch": "اختر المنتج",
+        "sellProduct": "اختر المنتج"
+      }
+    },
+    "unitSelect": {
+      "labels": {
+        "createNewBatch": "الوحدة"
+      },
+      "placeholders": {
+        "createNewBatch": "اختر الوحدة"
+      }
+    },
+    "qtyReceived": {
+      "labels": {
+        "createNewBatch": "الكمية المستلمة مبدئيًا"
+      }
+    },
+    "expiresAt": {
+      "labels": {
+        "createNewBatch": "تاريخ الانتهاء"
+      }
+    },
+    "qtyToSell": {
+      "labels": {
+        "sellProduct": "الكمية المراد بيعها"
+      }
+    },
+    "submit": {
+      "labels": {
+        "createNewProduct": "إنشاء منتج",
+        "createNewBatch": "إنشاء دفعة"
+      }
+    },
+    "sell": {
+      "buttons": {
+        "submit": "بيع"
+      },
+      "popups": {
+        "title": "بيع منتج",
+        "resultTitle": "نتيجة البيع",
+        "emptyResult": "لم يتم اختيار أي دفعة.",
+        "batchLabel": "دفعة {id}"
+      }
+    },
+    "errors": {
+      "name": {
+        "required": "الاسم مطلوب",
+        "tooLong": "الاسم طويل جدًا"
+      },
+      "sku": {
+        "required": "رمز SKU مطلوب",
+        "tooLong": "رمز SKU طويل جدًا",
+        "invalidChars": "رمز SKU يحتوي على أحرف غير صالحة"
+      },
+      "minStockLevel": {
+        "integer": "الحد الأدنى للمخزون يجب أن يكون عددًا صحيحًا",
+        "notNegative": "الحد الأدنى للمخزون لا يمكن أن يكون سالبًا"
+      },
+      "currentStock": {
+        "integer": "المخزون الحالي يجب أن يكون عددًا صحيحًا",
+        "notNegative": "المخزون الحالي لا يمكن أن يكون سالبًا"
+      },
+      "productId": {
+        "required": "المنتج مطلوب"
+      },
+      "unitId": {
+        "required": "الوحدة مطلوبة"
+      },
+      "qtyToSell": {
+        "integer": "الكمية المراد بيعها يجب أن تكون عددًا صحيحًا",
+        "min": "الكمية المراد بيعها يجب أن تكون على الأقل 1"
+      },
+      "expiresAt": {
+        "required": "تاريخ الانتهاء مطلوب",
+        "invalid": "تاريخ الانتهاء غير صالح",
+        "atLeastTomorrow": "يجب أن يكون تاريخ الانتهاء على الأقل من الغد."
+      }
+    }
+  },
+  "app": {
+    "name": "Auto Stock"
+  },
+  "links": {
+    "dashboard": {
+      "label": "لوحة التحكم"
+    },
+    "products": {
+      "label": "المنتجات"
+    },
+    "batches": {
+      "label": "الدُفعات"
+    },
+    "transactions": {
+      "label": "المعاملات"
+    },
+    "reports": {
+      "label": "التقارير"
+    }
+  },
+  "dashboard": {
+    "title": "لوحة التحكم",
+    "cards": {
+      "totalProducts": "إجمالي المنتجات",
+      "totalStock": "إجمالي المخزون (وحدات أساسية)",
+      "lowStockProducts": "منتجات منخفضة المخزون",
+      "expiredItems": "عناصر منتهية"
+    },
+    "messages": {
+      "selectProductToShowTheirBatches": "اختر منتجًا لعرض دفعاته",
+      "batchesFor": "دفعات {name} ({sku})"
+    }
+  },
+  "products": {
+    "title": "المنتجات",
+    "columns": {
+      "sku": "SKU",
+      "name": "المنتج",
+      "stock": "المخزون"
+    },
+    "labels": {
+      "updatedAt": "تم التحديث {date}",
+      "minStock": "الحد الأدنى {min}"
+    },
+    "badges": {
+      "lowStock": "مخزون منخفض"
+    },
+    "actions": {
+      "rowActions": "إجراءات الصف",
+      "sell": "بيع"
+    },
+    "buttons": {
+      "addProduct": "إضافة منتج جديد"
+    },
+    "popups": {
+      "createNewProduct": {
+        "title": "إنشاء منتج جديد"
+      }
+    }
+  },
+  "batches": {
+    "title": "الدُفعات",
+    "description": "إدارة الدُفعات الفردية في المخزون.",
+    "columns": {
+      "batchId": "معرّف الدفعة",
+      "sku": "SKU",
+      "product": "المنتج",
+      "status": "الحالة",
+      "remaining": "المتبقي",
+      "received": "المستلم",
+      "expires": "ينتهي"
+    },
+    "labels": {
+      "updatedAt": "تم التحديث {date}"
+    },
+    "badges": {
+      "expired": "منتهي",
+      "aboutToExpire": "على وشك الانتهاء"
+    },
+    "buttons": {
+      "createNewBatch": "إنشاء دفعة جديدة"
+    },
+    "popups": {
+      "createNewBatch": {
+        "title": "إنشاء دفعة جديدة"
+      }
+    }
+  },
+  "transactions": {
+    "title": "المعاملات",
+    "columns": {
+      "type": "النوع",
+      "sku": "SKU",
+      "product": "المنتج",
+      "qty": "الكمية",
+      "batch": "الدفعة"
+    },
+    "labels": {
+      "createdAt": "{date}",
+      "noExpiry": "لا يوجد تاريخ انتهاء"
+    }
+  }
+}
