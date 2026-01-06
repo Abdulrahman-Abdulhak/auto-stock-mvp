@@ -12,6 +12,11 @@ function stockTone(current: number, min: number) {
   return "default";
 }
 
+function statusTone(current: number, min: number) {
+  if (current < min) return "destructive";
+  return "default";
+}
+
 export const productColumns: ColumnDef<ProductRow>[] = [
   {
     accessorKey: "sku",
@@ -38,12 +43,20 @@ export const productColumns: ColumnDef<ProductRow>[] = [
     cell: ({ row }) => {
       const { currentStock, minStockLevel } = row.original;
       const variant = stockTone(currentStock, minStockLevel);
+      const statusVariant = statusTone(currentStock, minStockLevel);
+      const statusLabel = currentStock < minStockLevel ? "Low Stock" : null;
+
       return (
         <div className="flex items-center gap-2">
           <Badge variant={variant as any}>{currentStock}</Badge>
           <span className="text-xs text-muted-foreground">
             min {minStockLevel}
           </span>
+          {statusLabel && (
+            <Badge variant={statusVariant as any} className="uppercase">
+              {statusLabel}
+            </Badge>
+          )}
         </div>
       );
     },

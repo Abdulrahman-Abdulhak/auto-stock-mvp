@@ -12,6 +12,23 @@ const statusTone: Record<string, "secondary" | "default" | "destructive"> = {
   DEPLETED: "destructive",
 };
 
+function getExpiryBadge(expiresAt: string) {
+  const now = new Date();
+  const expiry = new Date(expiresAt);
+  if (Number.isNaN(expiry.getTime())) return null;
+
+  if (expiry <= now) {
+    return { label: "Expired", variant: "destructive" as const };
+  }
+
+  const sevenDaysMs = 7 * 24 * 60 * 60 * 1000;
+  if (expiry.getTime() - now.getTime() <= sevenDaysMs) {
+    return { label: "About to expire", variant: "secondary" as const };
+  }
+
+  return null;
+}
+
 export const batchColumns: ColumnDef<BatchRow>[] = [
   {
     accessorKey: "id",
@@ -69,10 +86,20 @@ export const batchColumns: ColumnDef<BatchRow>[] = [
   {
     accessorKey: "expiresAt",
     header: "Expires",
-    cell: ({ row }) => (
-      <span className="text-xs text-muted-foreground">
-        {new Date(row.original.expiresAt).toLocaleDateString()}
-      </span>
-    ),
+    cell: ({ row }) => {
+      const expiryLabel = getExpiryBadge(row.original.expiresAt);
+      return (
+        <div className="flex items-center gap-2">
+          <span className="text-xs text-muted-foreground">
+            {new Date(row.original.expiresAt).toLocaleDateString()}
+          </span>
+          {expiryLabel && (
+            <Badge variant={expiryLabel.variant} className="uppercase">
+              {expiryLabel.label}
+            </Badge>
+          )}
+        </div>
+      );
+    },
   },
 ];
